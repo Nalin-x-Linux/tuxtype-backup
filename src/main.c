@@ -45,6 +45,9 @@ int main(int argc, char *argv[])
   Uint32 lib_flags = 0;
   int i;
 
+  //Initialising TTS
+  tts_init();
+
   srand(time(NULL));
 
   //FIXME we should inspect return values and bail if these functions fail:
