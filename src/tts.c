@@ -3,6 +3,7 @@ Compile using folowing command
 gcc -Wall -o speak speak.c -lespeak -I/usr/include/espeak/
 */
 
+#define DEFAULT 0
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -25,7 +26,7 @@ void tts_init()
 }
 
 //Used to set person in TTS. in the case of espeak we will set language by this.
-void tts_set_voice_by_name(char voice_name[]){
+void tts_set_voice(char voice_name[]){
 	espeak_SetVoiceByName(voice_name);
 }
 
@@ -50,9 +51,19 @@ espeak_SetParameter(espeakPITCH,pitch,0);
 }
 
 
-void tts_say(const char* text, ...){
+void tts_say(int rate,int pitch,const char* text, ...){
 	espeak_POSITION_TYPE position_type;
 	espeak_Cancel();
+	
+	//Setting given rate if rate != 0
+	if (rate != DEFAULT)
+	tts_set_rate(rate);
+
+        //Setting pitch rate if rate != 0
+        if (pitch != DEFAULT)
+        tts_set_pitch(pitch);
+
+
 
 	char out[400] = "";
 	char temp[400] = "";
