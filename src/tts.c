@@ -3,6 +3,10 @@ Compile using folowing command
 gcc -Wall -o speak speak.c -lespeak -I/usr/include/espeak/
 */
 
+#define DEFAULT_VALUE 0
+#define INTERRUPT 0
+#define APPEND 1
+
 #define DEFAULT 0
 #include <string.h>
 #include <stdlib.h>
@@ -13,9 +17,18 @@ gcc -Wall -o speak speak.c -lespeak -I/usr/include/espeak/
 
 
 //TTS Thread function
-void tts_thread_func(void *unused)
+int tts_thread_func(void *arg)
 {
-		espeak_Synchronize();
+	int interrupt = *((int*)(arg));
+        if (interrupt != INTERRUPT) 
+        { 
+                while (espeak_IsPlaying()) 
+                { 
+                        fprintf(stderr,"\nAlive"); 
+                } 
+        } 
+	espeak_Synchronize();
+	return 1;
 }
 
 
@@ -50,78 +63,33 @@ void tts_set_pitch(int pitch){
 espeak_SetParameter(espeakPITCH,pitch,0);
 }
 
-
-void tts_say(int rate,int pitch,const char* text, ...){
-	espeak_POSITION_TYPE position_type;
-	espeak_Cancel();
+void tts_say(int rate,int pitch,int interrupt, const char* text, ...){
+	int *interrupt_address;
+	espeak_POSITION_TYPE position_type = POS_CHARACTER;
+		
+	
+			
+	if (interrupt == INTERRUPT)
+		tts_stop();
 	
 	//Setting given rate if rate != 0
-	if (rate != DEFAULT)
+	if (rate != DEFAULT_VALUE)
 	tts_set_rate(rate);
 
         //Setting pitch rate if rate != 0
-        if (pitch != DEFAULT)
+        if (pitch != DEFAULT_VALUE)
         tts_set_pitch(pitch);
 
-
-
-	char out[400] = "";
-	char temp[400] = "";
-
+	
+	char out[1000];
 	va_list list;
 	va_start(list,text);
-	int i=0,len;
-	while(i<strlen(text))
-	{
-			
-		len = strlen(out);
-		if(text[i] != '%')
-		{
-			out[len] = text[i];
-			out[len+1] = '\0';
-			i++;
-		}
-		else
-		{
-			if(text[i+1] == 'c')
-			{
-				out[len] = va_arg(list, int);
-				out[len+1] = '\0';
-				i+=2;
-			}
-
-
-			if(text[i+1] == 's')
-			{
-				strcat(out,va_arg(list, char*));
-				i+=2;
-			}
-			else if(text[i+1] == 'd')
-			{
-				sprintf(temp,"%d",va_arg(list, int));
-				strcat(out,temp);
-				i+=2;
-			}
-			else if(text[i+1] == 'f')
-			{
-				sprintf(temp,"%f",va_arg(list, double));
-				strcat(out,temp);
-				i+=2;
-			}
-
-			else
-			{
-				i++;
-			}			
-		}	
-	}	
+	vsprintf(out,text,list);
+	va_end(list);
 	
 	int Size = strlen(out)+1;    
 	espeak_Synth(out, Size, 0, position_type, 0,	espeakCHARS_AUTO,0, NULL);
-	SDL_CreateThread(tts_thread_func, NULL);
-}
-
-
-
-
-
+	fprintf(stderr,"\nTTS_Say : %s\n",out);
+	interrupt_address = &interrupt;
+	SDL_CreateThread(tts_thread_func, interrupt_address);
+}	
