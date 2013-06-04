@@ -35,6 +35,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "SDL_extras.h"
 #include "input_methods.h"
 
+
+//N.x.L
 /* Should these be constants? */
 static int tux_max_width = 0;                // the max width of the images of tux
 static int number_max_w = 0;                 // the max width of a number image
@@ -86,8 +88,47 @@ static void SpawnFishies(int diflevel, int* fishies, int* frame);
 static void UpdateTux(wchar_t letter_pressed, int fishies, int frame);
 static void WaitFrame(void);
 
-
-
+int tts_announcer(void *arg)
+{
+	int fishies,i,j,iter;
+	wchar_t buffer[3000];
+	wchar_t temp;
+	
+	
+	while(1)
+	{
+		fishies = *((int*)(arg));
+		fprintf(stderr,"\nFishies = %d",fishies);
+		for(i=0;i<fishies;i++)
+		{
+			if (fish_object[i].alive && !fish_object[i].can_eat)
+			{
+				wcscpy(buffer,fish_object[i].word);
+				fprintf(stderr,"\nFirst Buffer : %S",buffer);
+				iter = wcslen(fish_object[i].word);
+				buffer[iter] = L'.';iter++;
+				buffer[iter] = L' ';iter++;
+				for(j=0;j<wcslen(fish_object[i].word);j++)
+				{
+					temp = fish_object[i].word[j];
+					fprintf(stderr,"\nLetter : %c",temp);
+					buffer[iter] = temp;iter++;
+					buffer[iter] = L'.';iter++;
+					buffer[iter] = L' ';iter++;
+				}
+				buffer[iter] = L'\0';
+				fprintf(stderr,"\nLast Buffer : %S",buffer);
+				tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",buffer);
+				break;
+				//breaking for loop because we only have to announce the bottom alive fish 
+			}
+		}
+		
+		while (espeak_IsPlaying()){	}
+		SDL_Delay(1000);
+	}
+	
+}
 /************************************************************************/
 /*                                                                      */ 
 /*         "Public" functions (callable throughout program)             */
@@ -128,11 +169,26 @@ int PlayCascade(int diflevel)
   int temp_text_count;
   Uint16 key_unicode;
   Uint32 last_time, now_time;
+  
+  
+  //N.x.L
+  int *fish_address;
+  fish_address = &fishies; 
+  SDL_Thread *thread;
+  
+  
+  fprintf(stderr,"\nEntering game");
+  thread = SDL_CreateThread(tts_announcer, fish_address);
+  
 
   DEBUGCODE
   {
     fprintf(stderr, "->Entering PlayCascade(): level=%i\n", diflevel);
   }
+  
+ 
+  
+  
 
 //  SDL_ShowCursor(0); //don't really need this and it causes a bug on windows
 
@@ -329,7 +385,8 @@ int PlayCascade(int diflevel)
 	      case SDLK_LMETA:
               case SDLK_LSUPER:
               case SDLK_RSUPER:
-                break;
+	      tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Please don't press modifier keys!");
+	      break;
 
               default:
               /*----------------------------------------------------*/
@@ -538,6 +595,15 @@ int PlayCascade(int diflevel)
     }  /* End of post-level wrap-up  */
 
   }  /*   -------- End outer game loop -------------- */
+  
+
+
+  //N.x.L
+  fprintf(stderr,"Exiting game");
+  SDL_KillThread(thread);
+
+
+
 
 //  SNOW_on = 0;
 
