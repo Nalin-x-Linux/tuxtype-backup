@@ -92,32 +92,31 @@ int tts_announcer(void *arg)
 {
 	int fishies,i,j,iter;
 	wchar_t buffer[3000];
-	wchar_t temp;
 	
 	
 	while(1)
 	{
 		fishies = *((int*)(arg));
-		fprintf(stderr,"\nFishies = %d",fishies);
+		fprintf(stderr,"\nFishies = %d in hand = %d",fishies,tux_object.wordlen);
 		for(i=0;i<fishies;i++)
 		{
 			if (fish_object[i].alive && !fish_object[i].can_eat)
 			{
 				wcscpy(buffer,fish_object[i].word);
-				fprintf(stderr,"\nFirst Buffer : %S",buffer);
 				iter = wcslen(fish_object[i].word);
 				buffer[iter] = L'.';iter++;
 				buffer[iter] = L' ';iter++;
 				for(j=0;j<wcslen(fish_object[i].word);j++)
 				{
-					temp = fish_object[i].word[j];
-					fprintf(stderr,"\nLetter : %c",temp);
-					buffer[iter] = temp;iter++;
-					buffer[iter] = L'.';iter++;
-					buffer[iter] = L' ';iter++;
+					//Skipping if the letter is in orange color. if not it will be appended
+					if (fish_object[i].word[j] != tux_object.word[j])
+					{
+						buffer[iter] = fish_object[i].word[j];iter++;
+						buffer[iter] = L'.';iter++;
+						buffer[iter] = L' ';iter++;
+					}
 				}
 				buffer[iter] = L'\0';
-				fprintf(stderr,"\nLast Buffer : %S",buffer);
 				tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",buffer);
 				break;
 				//breaking for loop because we only have to announce the bottom alive fish 
@@ -125,7 +124,7 @@ int tts_announcer(void *arg)
 		}
 		
 		while (espeak_IsPlaying()){	}
-		SDL_Delay(1000);
+		SDL_Delay(100);
 	}
 	
 }
