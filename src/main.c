@@ -45,9 +45,6 @@ int main(int argc, char *argv[])
   Uint32 lib_flags = 0;
   int i;
 
-  //Initialising TTS
-  tts_init();
-
   srand(time(NULL));
 
   //FIXME we should inspect return values and bail if these functions fail:
@@ -80,6 +77,10 @@ int main(int argc, char *argv[])
         fprintf(stderr, "\n\t\tAllow in-game sounds (default)");
         fprintf(stderr, "\n\n\t-ns, --nosound");
         fprintf(stderr, "\n\t\tDisables in-game sounds");
+        fprintf(stderr, "\n\n\t-a, --tts");
+        fprintf(stderr, "\n\t\tEnable in-game accessibility");
+        fprintf(stderr, "\n\n\t-na, --notts");
+        fprintf(stderr, "\n\t\tDisables in-game accessibility");
         fprintf(stderr, "\n\n\t-t {THEME}, --theme {THEME}");
         fprintf(stderr, "\n\t\tUse theme named {THEME}, if it exists");
         fprintf(stderr, "\n\n\t-sp, --speed");
@@ -126,6 +127,14 @@ int main(int argc, char *argv[])
       if (  (strcmp(argv[i], "-ns") == 0)
          || (strcmp(argv[i], "--nosound") == 0))
         settings.sys_sound = 0;
+
+      if (  (strcmp(argv[i], "-a") == 0)
+         || (strcmp(argv[i], "--tts") == 0))
+        settings.tts = 1;
+
+      if (  (strcmp(argv[i], "-na") == 0)
+         || (strcmp(argv[i], "--notts") == 0))
+        settings.tts = 0;
 
       if (  (strcmp(argv[i], "--hidden") == 0)
          || (strcmp(argv[i], "-hidden") == 0))
@@ -179,7 +188,14 @@ int main(int argc, char *argv[])
     Mix_VolumeMusic(settings.mus_volume);
     Mix_Volume(-1, settings.sfx_volume);
   }
-
+  
+  if (settings.tts)
+  {
+	  //Initialising TTS
+	  tts_init();
+	  tts_set_volume(settings.tts_volume);
+  }
+  
   /* FIXME: we should check config files/environment variables like LANG! */
   /* NOTE what should we do if LANG is something without a theme - should */
   /* we then default to English?                                          */
