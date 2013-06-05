@@ -36,7 +36,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "input_methods.h"
 
 
-//N.x.L
 /* Should these be constants? */
 static int tux_max_width = 0;                // the max width of the images of tux
 static int number_max_w = 0;                 // the max width of a number image
@@ -177,17 +176,24 @@ int PlayCascade(int diflevel)
   Uint16 key_unicode;
   Uint32 last_time, now_time;
   
-  
-  //N.x.L 
-  //Creating thread which annonces the word to type
-  //Passing address of fishies for finding the first fish to type
+  //TTS Word announcer variables
   int *fish_address;
-  fish_address = &fishies; 
   SDL_Thread *thread;
   
   
-  fprintf(stderr,"\nEntering game");
-  thread = SDL_CreateThread(tts_announcer, fish_address);
+  
+  
+  if (settings.tts && settings.sys_sound) 
+  {
+	  //Passing address of fishies for finding the first fish to type
+	  fish_address = &fishies;
+	  //Call announcer function in thread which annonces the word to type 
+	  thread = SDL_CreateThread(tts_announcer, fish_address);
+  }
+  
+  
+  
+  
   
 
   DEBUGCODE
