@@ -408,6 +408,8 @@ void TitleScreen(void)
               key_menu--;
               if (key_menu < 1)
                 key_menu = 5;
+              if (settings.tts && settings.sys_sound && settings.menu_sound) 
+				tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",gettext(menu_text[key_menu*5 + menu_depth]));
               break;
             }
 
@@ -420,6 +422,8 @@ void TitleScreen(void)
                 PlaySound(snd_move);
               if (key_menu > 5)
                 key_menu = 1;
+              if (settings.tts && settings.sys_sound && settings.menu_sound) 
+				tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",gettext(menu_text[key_menu*5 + menu_depth]));
               break;
             }
 
@@ -1573,10 +1577,18 @@ static int chooseWordlist(void)
       for (i = start; i< MIN(start + 8,lists); i++) 
       {
         titleRects[i % 8].x = screen->w/2 - (titles[i]->w/2);
-        if (i == loc)   /* Draw selected text in yellow:  */
+        if (i == loc)
+        {
+			/* Draw selected text in yellow:  */
           SDL_BlitSurface(select[loc], NULL, screen, &titleRects[i%8]);
-        else            /* Draw unselected text in white: */
-          SDL_BlitSurface(titles[i], NULL, screen, &titleRects[i%8]);
+          if (settings.tts && settings.sys_sound && settings.menu_sound)
+          	tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",wordlistName[loc]);
+        }  
+        else
+        {
+			/* Draw unselected text in white: */
+            SDL_BlitSurface(titles[i], NULL, screen, &titleRects[i%8]);
+		}
       }
 
       /* --- draw arrow buttons --- */
