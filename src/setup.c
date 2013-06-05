@@ -362,8 +362,6 @@ static int load_settings_fp(FILE* fp)
       DEBUGCODE {fprintf(stderr, "load_settings_fp(): unrecognized string: %s\n", value);}
 
   }
-
-
   if (setting_found)
     return 1;
   else
