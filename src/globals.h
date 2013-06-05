@@ -98,6 +98,8 @@ typedef struct game_option_type{
   int use_english;
   int fullscreen;
   int sys_sound;
+  int tts;
+  int tts_volume;
   int sfx_volume;
   int mus_volume;
   int menu_music;
@@ -120,6 +122,8 @@ typedef struct game_option_type{
 #define DEFAULT_LOCALE	        "en_US.UTF-8"
 #define DEFAULT_USE_ENGLISH 1
 #define DEFAULT_FULLSCREEN 1
+#define DEFAULT_TTS 1
+#define DEFAULT_TTS_VOLUME 100
 #define DEFAULT_SYS_SOUND 1
 #define DEFAULT_SFX_VOLUME 100
 #define DEFAULT_MUS_VOLUME 100
