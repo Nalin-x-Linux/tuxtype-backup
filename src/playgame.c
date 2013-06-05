@@ -87,14 +87,26 @@ static void SpawnFishies(int diflevel, int* fishies, int* frame);
 static void UpdateTux(wchar_t letter_pressed, int fishies, int frame);
 static void WaitFrame(void);
 
-int tts_announcer(void *arg)
+int tts_announcer(void *struct_address)
 {
-	int fishies,i,j,iter;
+	struct tts_announcer_cascade_data_struct struct_with_data_address = *((struct tts_announcer_cascade_data_struct*)(struct_address));
+	int fishies,tts_pause,i,j,iter;
 	wchar_t buffer[3000];
 	while(1)
 	{
-		//Converting and taking the value of fishies from void * address 
-		fishies = *((int*)(arg));
+		//Converting and taking the value of fishies from void address structure 
+		fishies = *struct_with_data_address.address_of_fishies;
+		tts_pause = *struct_with_data_address.address_of_tts_pause;
+
+		while (espeak_IsPlaying()){	}
+		SDL_Delay(100);		
+		
+		//Skipping the loop if paused
+		if (tts_pause)
+			continue;
+
+		
+		
 		for(i=0;i<fishies;i++)
 		{
 			//Detecting the first fish to be typed.
@@ -130,8 +142,7 @@ int tts_announcer(void *arg)
 			}
 		}
 		
-		while (espeak_IsPlaying()){	}
-		SDL_Delay(100);
+
 	}
 	
 }
@@ -152,6 +163,7 @@ int PlayCascade(int diflevel)
   int setup_new_level = 1;
   int won_level = 0;
   int quitting = 0;
+  int tts_pause = 0;
   int curlevel = 0;
   int i = 0;
   int curlives = 0;
@@ -177,18 +189,28 @@ int PlayCascade(int diflevel)
   Uint32 last_time, now_time;
   
   //TTS Word announcer variables
-  int *fish_address;
   SDL_Thread *thread;
   
+  //Structure which contain the address of variables 
+  struct tts_announcer_cascade_data_struct struct_with_data_address;
   
+  //Giving address of variables
+  struct_with_data_address.address_of_fishies = &fishies;
+  struct_with_data_address.address_of_tts_pause = &tts_pause;
+  
+  
+  //Structure which contain the address of above struct 
+  //Why ? : Only one argument can be passed through thread  
+  struct tts_announcer_cascade_data_struct *struct_address_to_pass;
+  
+  //Setting the address
+  struct_address_to_pass = &struct_with_data_address;
   
   
   if (settings.tts && settings.sys_sound) 
   {
-	  //Passing address of fishies for finding the first fish to type
-	  fish_address = &fishies;
 	  //Call announcer function in thread which annonces the word to type 
-	  thread = SDL_CreateThread(tts_announcer, fish_address);
+	  thread = SDL_CreateThread(tts_announcer, struct_address_to_pass);
   }
   
   
@@ -377,8 +399,11 @@ int PlayCascade(int diflevel)
                 break;
 
               case SDLK_ESCAPE:
+                tts_pause = 1;
+                if(settings.tts && settings.sys_sound) tts_say(DEFAULT_VALUE,DEFAULT_VALUE,APPEND,"Game Paused.");
+                
                 /* Pause() returns 1 if quitting, */
-                /* 0 if returning to game:        */
+                /* 0 if returning to game:        */                
                 if (Pause() == 1)
                 {
                   playing_level = 0;
@@ -386,7 +411,13 @@ int PlayCascade(int diflevel)
                   quitting = 1;
                 }
                 else  /* Returning to game */
-                  DrawBackground();
+                {
+					tts_pause = 0;
+					if(settings.tts && settings.sys_sound)
+					   tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Pause Released!");
+					
+					DrawBackground();
+				}
                 break;
 
               /*  Don't count modifier keys as keystrokes in game: */ 
