@@ -43,7 +43,9 @@ void Opts_Initialize(void)
   strncpy(settings.theme_locale_name, DEFAULT_LOCALE, FNLEN);
   settings.use_english = DEFAULT_USE_ENGLISH;
   settings.fullscreen = DEFAULT_FULLSCREEN;
-  settings.sys_sound = DEFAULT_SYS_SOUND;
+  settings.sys_sound = DEFAULT_SYS_SOUND;  
+  settings.tts = DEFAULT_TTS;
+  settings.tts_volume = DEFAULT_TTS_VOLUME;
   settings.sfx_volume = DEFAULT_SFX_VOLUME;
   settings.mus_volume = DEFAULT_MUS_VOLUME;
   settings.menu_music = DEFAULT_MENU_MUSIC;
