@@ -300,10 +300,13 @@ void ChooseTheme(void)
       {
         titleRects[i%8].x = 160 - (titles[i]->w/2);
 
-        if (i == loc)
+        if (i == loc){
           SDL_BlitSurface(select[loc], NULL, screen, &titleRects[i%8]);
-        else
-          SDL_BlitSurface(titles[i], NULL, screen, &titleRects[i%8]);
+          if (settings.tts && settings.sys_sound && settings.menu_sound)
+             tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",themeNames[loc]);
+	     }
+	     else
+	     SDL_BlitSurface(titles[i], NULL, screen, &titleRects[i%8]);
       }
 
       /* --- draw buttons --- */
