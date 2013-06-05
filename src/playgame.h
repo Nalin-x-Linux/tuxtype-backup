@@ -156,6 +156,12 @@ struct splatter {
 
 struct splatter null_splat;
 
+//Structure for passing address of data to threded function 
+struct tts_announcer_cascade_data_struct
+{
+	int *address_of_fishies;
+	int *address_of_tts_pause;
+};
 
 
 
