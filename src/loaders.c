@@ -82,6 +82,7 @@ void LoadLang(void)
 {
   char *s1, *s2, *s3, *s4;
   char buf [30];
+  char tts_language[10];
   s1 = setlocale(LC_ALL, settings.theme_locale_name);
   s2 = bindtextdomain(PACKAGE, TUXLOCALE);
   s3 = bind_textdomain_codeset(PACKAGE, "UTF-8");
@@ -104,6 +105,15 @@ void LoadLang(void)
   snprintf(buf, 30, "%s", settings.theme_locale_name);
   buf[5] = '\0';  //en_US" rather than "en_US.utf8"
   DEBUGCODE { fprintf(stderr, "buf is: %s\n", buf); }
+  
+  
+  //Setting TTS language
+  if (settings.tts)
+  {
+	  sprintf(tts_language,"%.*s",2,buf);
+	  tts_set_voice(tts_language);
+  }
+  
 
   if (my_setenv("LANG", buf) == -1)
   {
