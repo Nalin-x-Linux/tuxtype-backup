@@ -92,22 +92,29 @@ int tts_announcer(void *arg)
 {
 	int fishies,i,j,iter;
 	wchar_t buffer[3000];
-	
-	
 	while(1)
 	{
+		//Converting and taking the value of fishies from void * address 
 		fishies = *((int*)(arg));
-		fprintf(stderr,"\nFishies = %d in hand = %d",fishies,tux_object.wordlen);
 		for(i=0;i<fishies;i++)
 		{
+			//Detecting the first fish to be typed.
 			if (fish_object[i].alive && !fish_object[i].can_eat)
 			{
+				//Now using a bad idea which select the first spawn fish 
+				//to be typed 
+				
+				//Adding the word
 				wcscpy(buffer,fish_object[i].word);
 				iter = wcslen(fish_object[i].word);
 				buffer[iter] = L'.';iter++;
 				buffer[iter] = L' ';iter++;
+				
+				//Adding the letters to be announced (PAPA's suggestion)
+				//Eg : "BLUE. B. L. U. E"
 				for(j=0;j<wcslen(fish_object[i].word);j++)
 				{
+					//This is as per my PAPA's suggestion (sathyan)  
 					//Skipping if the letter is in orange color. if not it will be appended
 					if (fish_object[i].word[j] != tux_object.word[j])
 					{
@@ -116,6 +123,7 @@ int tts_announcer(void *arg)
 						buffer[iter] = L' ';iter++;
 					}
 				}
+				//
 				buffer[iter] = L'\0';
 				tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",buffer);
 				break;
@@ -170,7 +178,9 @@ int PlayCascade(int diflevel)
   Uint32 last_time, now_time;
   
   
-  //N.x.L
+  //N.x.L 
+  //Creating thread which annonces the word to type
+  //Passing address of fishies for finding the first fish to type
   int *fish_address;
   fish_address = &fishies; 
   SDL_Thread *thread;
