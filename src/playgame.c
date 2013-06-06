@@ -87,7 +87,7 @@ static void SpawnFishies(int diflevel, int* fishies, int* frame);
 static void UpdateTux(wchar_t letter_pressed, int fishies, int frame);
 static void WaitFrame(void);
 
-int tts_announcer(void *struct_address)
+static int tts_announcer(void *struct_address)
 {
 	struct tts_announcer_cascade_data_struct struct_with_data_address = *((struct tts_announcer_cascade_data_struct*)(struct_address));
 	int fishies,i,j,iter,which,time_to_splat;
@@ -115,7 +115,7 @@ int tts_announcer(void *struct_address)
 				which = i;
 			}
 		}
-		
+				
 		
 		
 		if (which != -1 && fish_object[which].alive && !fish_object[which].can_eat)
@@ -243,19 +243,12 @@ int PlayCascade(int diflevel)
 	  thread = SDL_CreateThread(tts_announcer, struct_address_to_pass);
   }
   
-  
-  
-  
-  
 
   DEBUGCODE
   {
     fprintf(stderr, "->Entering PlayCascade(): level=%i\n", diflevel);
   }
-  
- 
-  
-  
+
 
 //  SDL_ShowCursor(0); //don't really need this and it causes a bug on windows
 

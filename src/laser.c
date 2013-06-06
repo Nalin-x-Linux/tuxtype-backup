@@ -72,6 +72,54 @@ static void laser_unload_data(void);
 static void calc_city_pos(void);
 static void recalc_comet_pos(void);
 
+
+static int tts_announcer(void *unused)
+{
+	int lowest,lowest_y,i;
+	char buffer[250];
+	while(1)
+	{
+		//Detecting the lowest letter and word on screen		
+		lowest_y = 0;
+		lowest = -1;	
+		for (i = 0; i < MAX_COMETS; i++)
+			if (comets[i].alive
+			 && comets[i].shootable 
+			 && comets[i].expl == 0 
+			 && comets[i].y > lowest_y)
+			{
+					lowest = i;
+					lowest_y = comets[i].y;
+				}
+		fprintf(stderr,"\nCH : %C",comets[lowest].ch);
+
+		//Appending the letters in word commet
+		for (i = 0; i < MAX_COMETS; i++)
+			if (comets[i].alive
+			 && comets[i].shootable 
+			 && comets[i].expl == 0 
+			 && comets[i].y > lowest_y)
+			{
+					lowest = i;
+					lowest_y = comets[i].y;
+				}		
+		
+			
+		
+		//Wait to finish saying the previus word
+		while (espeak_IsPlaying()){	}
+		SDL_Delay(1000);
+			
+	}
+	return 1;
+}
+
+
+
+
+
+
+
 /* --- MAIN GAME FUNCTION!!! --- */
 
 /* TODO modify game to allow longer words (12 chars or so) */
@@ -83,6 +131,11 @@ int PlayLaserGame(int diff_level)
 	    tux_same_counter, level_start_wait, num_cities_alive,
 	    num_comets_alive, paused, picked_comet, 
 	    gameover;
+	  
+
+	//TTS Word announcer variables
+	SDL_Thread *thread;
+
 
 	Uint16 key_unicode;
 
@@ -155,6 +208,15 @@ int PlayLaserGame(int diff_level)
 	ans_num = 0;
 
 	MusicPlay(musics[MUS_GAME + (rand() % NUM_MUSICS)], 0);
+	
+
+
+	if (settings.tts && settings.sys_sound) 
+	{
+	  //Call announcer function in thread which annonces the word to type 
+	  thread = SDL_CreateThread(tts_announcer, NULL);
+	}	
+	
 
 	do {
 
