@@ -92,7 +92,7 @@ static int tts_announcer(void *unused)
 					lowest_y = comets[i].y;
 				}
 		fprintf(stderr,"\nCH : %C",comets[lowest].ch);
-
+/*
 		//Appending the letters in word commet
 		for (i = 0; i < MAX_COMETS; i++)
 			if (comets[i].alive
@@ -103,7 +103,7 @@ static int tts_announcer(void *unused)
 					lowest = i;
 					lowest_y = comets[i].y;
 				}		
-		
+*/		
 			
 		
 		//Wait to finish saying the previus word
