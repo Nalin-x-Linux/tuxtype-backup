@@ -90,24 +90,23 @@ static void WaitFrame(void);
 int tts_announcer(void *struct_address)
 {
 	struct tts_announcer_cascade_data_struct struct_with_data_address = *((struct tts_announcer_cascade_data_struct*)(struct_address));
-	int fishies,tts_pause,i,j,iter,which,time_to_splat;
+	int fishies,i,j,iter,which,time_to_splat;
 	wchar_t buffer[3000];
+	int correct_position;
+	
 	while(1)
 	{
 		//Converting and taking the value of fishies from void address structure 
 		fishies = *struct_with_data_address.address_of_fishies;
-		tts_pause = *struct_with_data_address.address_of_tts_pause;
 
+		//Wait to finish saying the previus word
 		while (espeak_IsPlaying()){	}
 		SDL_Delay(100);		
 		
-		//Skipping the loop if paused
-		if (tts_pause)
-			continue;
 
+		//Detecting the first fish to be typed.
 		time_to_splat = 0;
 		which = -1;
-		//Detecting the first fish to be typed.
 		for(i=0;i<fishies;i++)
 		{
 			if (!fish_object[i].can_eat && fish_object[i].alive && (!time_to_splat || fish_object[i].splat_time < time_to_splat))
@@ -117,6 +116,8 @@ int tts_announcer(void *struct_address)
 			}
 		}
 		
+		
+		
 		if (which != -1 && fish_object[which].alive && !fish_object[which].can_eat)
 		{
 			//Adding the word
@@ -124,57 +125,54 @@ int tts_announcer(void *struct_address)
 			iter = wcslen(fish_object[which].word);
 			buffer[iter] = L'.';iter++;
 			buffer[iter] = L' ';iter++;
-				
 			
-			
-			
-			
-			red_letters = -1;  j = 0;
-			while (j < tux_object.wordlen && red_letters == -1)
-			{
-				int k;
-				for (k = 0; k < tux_object.wordlen - j; k++)
-				{
-					if (fish_object[which].word[k] != tux_object.word[j + k])
-					   k = 100000;
-			    }
-			    if (k < 100000)
-			       red_letters = tux_object.wordlen - j;
-			    else
-			       j++;
-			 }
-			
-			
-			
-			
-			
-			
-			//Adding the letters to be announced (PAPA's suggestion)
+			//Adding the remaining letters to be announced.
+			//This is as per my PAPA's suggestion (sathyan)  
 			//Eg : "BLUE. B. L. U. E"
-			for(j=wcslen(tux_object.word);j<wcslen(fish_object[which].word);j++)
+			
+			//Detecting the correct_position
+			correct_position = 0;
+			for(j=0;j<tux_object.wordlen;j++)
 			{
-				//This is as per my PAPA's suggestion (sathyan)  
+				if (tux_object.word[j] == fish_object[which].word[j])
+				{
+					correct_position+=1;
+				}
+				else
+				{
+					tux_object.wordlen = 0;
+					tux_object.word[0] = L'\n';
+					break;
+				}
+			}
+			
+			//Appending each letters from correct_position
+			for(j=correct_position;j<wcslen(fish_object[which].word);j++)
+			{
 				//Skipping if the letter is in orange color. if not it will be appended
-
 				buffer[iter] = fish_object[which].word[j];iter++;
 				buffer[iter] = L'.';iter++;
 				buffer[iter] = L' ';iter++;
 			}
-			//
 			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			buffer[iter] = L'\0';
+/*
+			for(j=0;j<wcslen(fish_object[which].word);j++)
+			{
+				if (tux_object.word[j] != fish_object[which].word[j])
+				{
+					tux_object.wordlen = 0;
+					tux_object.word[0] = L'\n';
+					//Skipping if the letter is in orange color. if not it will be appended
+					buffer[iter] = fish_object[which].word[j];iter++;
+					buffer[iter] = L'.';iter++;
+					buffer[iter] = L' ';iter++;					
+				}
+				
+			}
+*/
+
+			//If not ended with '\0' it will say grabage values also
+			buffer[iter] = L'\0'; 
 			tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",buffer);
 		}
 	}
@@ -197,7 +195,6 @@ int PlayCascade(int diflevel)
   int setup_new_level = 1;
   int won_level = 0;
   int quitting = 0;
-  int tts_pause = 0;
   int curlevel = 0;
   int i = 0;
   int curlives = 0;
@@ -230,7 +227,6 @@ int PlayCascade(int diflevel)
   
   //Giving address of variables
   struct_with_data_address.address_of_fishies = &fishies;
-  struct_with_data_address.address_of_tts_pause = &tts_pause;
   
   
   //Structure which contain the address of above struct 
@@ -433,8 +429,11 @@ int PlayCascade(int diflevel)
                 break;
 
               case SDLK_ESCAPE:
-                tts_pause = 1;
-                if(settings.tts && settings.sys_sound) tts_say(DEFAULT_VALUE,DEFAULT_VALUE,APPEND,"Game Paused.");
+                SDL_KillThread(thread);
+                
+                
+                if(settings.tts && settings.sys_sound)
+                tts_say(DEFAULT_VALUE,DEFAULT_VALUE,APPEND,"Game Paused.");
                 
                 /* Pause() returns 1 if quitting, */
                 /* 0 if returning to game:        */                
@@ -446,9 +445,12 @@ int PlayCascade(int diflevel)
                 }
                 else  /* Returning to game */
                 {
-					tts_pause = 0;
 					if(settings.tts && settings.sys_sound)
+					{
 					   tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Pause Released!");
+					  //Call announcer function in thread which annonces the word to type
+					  thread = SDL_CreateThread(tts_announcer, struct_address_to_pass);
+					}
 					
 					DrawBackground();
 				}
