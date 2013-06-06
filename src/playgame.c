@@ -90,7 +90,7 @@ static void WaitFrame(void);
 int tts_announcer(void *struct_address)
 {
 	struct tts_announcer_cascade_data_struct struct_with_data_address = *((struct tts_announcer_cascade_data_struct*)(struct_address));
-	int fishies,tts_pause,i,j,iter;
+	int fishies,tts_pause,i,j,iter,which,time_to_splat;
 	wchar_t buffer[3000];
 	while(1)
 	{
@@ -105,44 +105,78 @@ int tts_announcer(void *struct_address)
 		if (tts_pause)
 			continue;
 
-		
-		
+		time_to_splat = 0;
+		which = -1;
+		//Detecting the first fish to be typed.
 		for(i=0;i<fishies;i++)
 		{
-			//Detecting the first fish to be typed.
-			if (fish_object[i].alive && !fish_object[i].can_eat)
+			if (!fish_object[i].can_eat && fish_object[i].alive && (!time_to_splat || fish_object[i].splat_time < time_to_splat))
 			{
-				//Now using a bad idea which select the first spawn fish 
-				//to be typed 
-				
-				//Adding the word
-				wcscpy(buffer,fish_object[i].word);
-				iter = wcslen(fish_object[i].word);
-				buffer[iter] = L'.';iter++;
-				buffer[iter] = L' ';iter++;
-				
-				//Adding the letters to be announced (PAPA's suggestion)
-				//Eg : "BLUE. B. L. U. E"
-				for(j=0;j<wcslen(fish_object[i].word);j++)
-				{
-					//This is as per my PAPA's suggestion (sathyan)  
-					//Skipping if the letter is in orange color. if not it will be appended
-					if (fish_object[i].word[j] != tux_object.word[j])
-					{
-						buffer[iter] = fish_object[i].word[j];iter++;
-						buffer[iter] = L'.';iter++;
-						buffer[iter] = L' ';iter++;
-					}
-				}
-				//
-				buffer[iter] = L'\0';
-				tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",buffer);
-				break;
-				//breaking for loop because we only have to announce the bottom alive fish 
+				time_to_splat = fish_object[i].splat_time;
+				which = i;
 			}
 		}
 		
+		if (which != -1 && fish_object[which].alive && !fish_object[which].can_eat)
+		{
+			//Adding the word
+			wcscpy(buffer,fish_object[which].word);
+			iter = wcslen(fish_object[which].word);
+			buffer[iter] = L'.';iter++;
+			buffer[iter] = L' ';iter++;
+				
+			
+			
+			
+			
+			red_letters = -1;  j = 0;
+			while (j < tux_object.wordlen && red_letters == -1)
+			{
+				int k;
+				for (k = 0; k < tux_object.wordlen - j; k++)
+				{
+					if (fish_object[which].word[k] != tux_object.word[j + k])
+					   k = 100000;
+			    }
+			    if (k < 100000)
+			       red_letters = tux_object.wordlen - j;
+			    else
+			       j++;
+			 }
+			
+			
+			
+			
+			
+			
+			//Adding the letters to be announced (PAPA's suggestion)
+			//Eg : "BLUE. B. L. U. E"
+			for(j=wcslen(tux_object.word);j<wcslen(fish_object[which].word);j++)
+			{
+				//This is as per my PAPA's suggestion (sathyan)  
+				//Skipping if the letter is in orange color. if not it will be appended
 
+				buffer[iter] = fish_object[which].word[j];iter++;
+				buffer[iter] = L'.';iter++;
+				buffer[iter] = L' ';iter++;
+			}
+			//
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			buffer[iter] = L'\0';
+			tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",buffer);
+		}
 	}
 	
 }
