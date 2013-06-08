@@ -146,13 +146,16 @@ static int tts_announcer(void *struct_address)
 				}
 			}
 			
-			//Appending each letters from correct_position
-			for(j=correct_position;j<wcslen(fish_object[which].word);j++)
+			//Appending each letters from correct_position if word is not alphabet
+			if (1<wcslen(fish_object[which].word))
 			{
-				//Skipping if the letter is in orange color. if not it will be appended
-				buffer[iter] = fish_object[which].word[j];iter++;
-				buffer[iter] = L'.';iter++;
-				buffer[iter] = L' ';iter++;
+				for(j=correct_position;j<wcslen(fish_object[which].word);j++)
+				{
+					//Skipping if the letter is in orange color. if not it will be appended
+					buffer[iter] = fish_object[which].word[j];iter++;
+					buffer[iter] = L'.';iter++;
+					buffer[iter] = L' ';iter++;
+				}
 			}
 			
 /*

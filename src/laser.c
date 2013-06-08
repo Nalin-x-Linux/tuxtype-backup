@@ -98,13 +98,19 @@ static int tts_announcer(void *unused)
 			continue;
 		
 		buffer[0] = L'\0';
+		//Adding the word to buffer
 		wcscpy(buffer,comets[lowest].word);
 		iter = wcslen(comets[lowest].word);
-		for(i=comets[lowest].pos;i<wcslen(comets[lowest].word);i++)
+		
+		//Appending each letters from correct_position if word is not alphabet
+		if (1<wcslen(comets[lowest].word))
 		{
+			for(i=comets[lowest].pos;i<wcslen(comets[lowest].word);i++)
+			{
 				buffer[iter]=L'.';iter++;
 				buffer[iter]=L' ';iter++;				
 				buffer[iter]=comets[lowest].word[i];iter++;
+			}
 		}
 		buffer[iter] = L'\0';	
 		tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",buffer);
