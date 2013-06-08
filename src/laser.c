@@ -75,37 +75,39 @@ static void recalc_comet_pos(void);
 
 static int tts_announcer(void *unused)
 {
-	int lowest,lowest_y,i;
-	char buffer[250];
+	int lowest,lowest_y,i,iter;
+	wchar_t buffer[3000];
 	while(1)
 	{
 		//Detecting the lowest letter and word on screen		
 		lowest_y = 0;
 		lowest = -1;	
 		for (i = 0; i < MAX_COMETS; i++)
-			if (comets[i].alive
-			 && comets[i].shootable 
-			 && comets[i].expl == 0 
-			 && comets[i].y > lowest_y)
+		{
+			if (comets[i].alive  &&
+			 comets[i].shootable  &&
+			  comets[i].expl == 0  &&
+			   comets[i].y > lowest_y)
 			{
-					lowest = i;
-					lowest_y = comets[i].y;
-				}
-		fprintf(stderr,"\nCH : %C",comets[lowest].ch);
-/*
-		//Appending the letters in word commet
-		for (i = 0; i < MAX_COMETS; i++)
-			if (comets[i].alive
-			 && comets[i].shootable 
-			 && comets[i].expl == 0 
-			 && comets[i].y > lowest_y)
-			{
-					lowest = i;
-					lowest_y = comets[i].y;
-				}		
-*/		
-			
+				lowest = i;
+				lowest_y = comets[i].y;
+			}
+		}
+		//Skipping if no letter found in screen
+		if (lowest == -1)
+			continue;
 		
+		buffer[0] = L'\0';
+		wcscpy(buffer,comets[lowest].word);
+		iter = wcslen(comets[lowest].word);
+		for(i=comets[lowest].pos;i<wcslen(comets[lowest].word);i++)
+		{
+				buffer[iter]=L'.';iter++;
+				buffer[iter]=L' ';iter++;				
+				buffer[iter]=comets[lowest].word[i];iter++;
+		}
+		buffer[iter] = L'\0';	
+		tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",buffer);
 		//Wait to finish saying the previus word
 		while (espeak_IsPlaying()){	}
 		SDL_Delay(1000);
@@ -291,21 +293,39 @@ int PlayLaserGame(int diff_level)
 	
 			lowest_y = 0;
 			lowest = -1;
-	
-			for (i = 0; i < MAX_COMETS; i++)
-				if (comets[i].alive
-				 && comets[i].shootable 
-				 && comets[i].expl == 0
-				 && comets[i].ch == ans[ans_num -1 ] 
-				 && comets[i].y > lowest_y)
-				{
-					lowest = i;
-					lowest_y = comets[i].y;
-				}
-	
+			
+			//Only Shoot the lowest letter if tts is enabled.
+			if (settings.tts)
+			{
+				for (i = 0; i < MAX_COMETS; i++)
+					if (comets[i].alive
+					&& comets[i].shootable 
+					&& comets[i].expl == 0
+					&& comets[i].y > lowest_y)
+					{
+						lowest = i;
+						lowest_y = comets[i].y;
+					}
+			
+					//Only Shoot the lowest letter.	
+					if (comets[lowest].ch != ans[ans_num -1 ])
+						lowest = -1;
+			}
+			else
+			{
+				for (i = 0; i < MAX_COMETS; i++)
+					if (comets[i].alive
+					&& comets[i].shootable 
+					&& comets[i].expl == 0
+					&& comets[i].ch == ans[ans_num -1 ] 
+					&& comets[i].y > lowest_y)
+					{
+						lowest = i;
+						lowest_y = comets[i].y;
+					}	
+			}
 	
 			/* If there was an comet with this answer, destroy it! */
-	
 			if (lowest != -1) {
 
 				/* Destroy comet: */
@@ -680,7 +700,16 @@ int PlayLaserGame(int diff_level)
 		/* If we're in "PAUSE" mode, pause! */
 
 		if (paused) {
+			SDL_KillThread(thread);
+			tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Game Paused!");
 			quit = Pause();
+			if(settings.tts && settings.sys_sound && quit == 0)
+				{
+					tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Pause Released!");
+					SDL_Delay(700);
+					//Call announcer function in thread which annonces the word to type
+					thread = SDL_CreateThread(tts_announcer, NULL);
+				}							
 			paused = 0;
 		}
 
@@ -975,6 +1004,8 @@ static void laser_add_comet(int diff_level)
 				comets[location].x = cities[target + i].x;
 				comets[location].y = 0;
 				comets[location].ch = word[i];
+				comets[location].word = word;
+				comets[location].pos = i;
 				comets[location].next = NULL;
 
 				/* Take care of link from previous letter's comet: */
