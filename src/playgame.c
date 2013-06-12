@@ -90,9 +90,12 @@ static void WaitFrame(void);
 static int tts_announcer(void *struct_address)
 {
 	struct tts_announcer_cascade_data_struct struct_with_data_address = *((struct tts_announcer_cascade_data_struct*)(struct_address));
-	int fishies,i,j,iter,which,time_to_splat;
+	int fishies,i,j,iter;
 	wchar_t buffer[3000];
-	int correct_position;
+	int fish_object_positions[10];
+	int alive,temp;
+	int pitch,rate;
+	int which,correct_position;
 	
 	while(1)
 	{
@@ -100,87 +103,160 @@ static int tts_announcer(void *struct_address)
 		fishies = *struct_with_data_address.address_of_fishies;
 
 		//Wait to finish saying the previus word
-		while (espeak_IsPlaying()){	}
-		SDL_Delay(100);		
+		//while (espeak_IsPlaying()){	}
+		//SDL_Delay(100);		
 		
-
-		//Detecting the first fish to be typed.
-		time_to_splat = 0;
-		which = -1;
-		for(i=0;i<fishies;i++)
+		rate = 40;
+		pitch = 40;
+		
+		//Checking the typed
+		if (tux_object.wordlen == 0)
 		{
-			if (!fish_object[i].can_eat && fish_object[i].alive && (!time_to_splat || fish_object[i].splat_time < time_to_splat))
+			//Adding the iter of each fish wich are alive and not can_eat
+			for(i=0,j=0;i<fishies;i++)
 			{
-				time_to_splat = fish_object[i].splat_time;
-				which = i;
+				if (!fish_object[i].can_eat && fish_object[i].alive)
+				{
+					fprintf(stderr,"\nAdding Fish %S",fish_object[i].word);
+					fish_object_positions[j]  = i; 
+					j++;
+					pitch+=10; rate+=10;
+				}
 			}
+			alive = j-1;
+			fprintf(stderr,"\nAlive = %d",alive);
+			
+
+			//Ordering the fish_object_positions with respect to splat time		
+			if (alive != 0)
+			{
+				fprintf(stderr,"\nMore than one Alive");
+				for (i=alive;i>=0;i--)
+				{
+					for (j=0;j<=i;j++)
+					{
+						//Comaparing fish_object[i].splat_time;
+						if (fish_object[fish_object_positions[j]].splat_time > fish_object[fish_object_positions[j+1]].splat_time)
+						{
+							temp = fish_object_positions[j];
+							fish_object_positions[j] = fish_object_positions[j+1];
+							fish_object_positions[j+1] = temp;
+						}
+					}
+				}
+			}
+			
+			else
+				fprintf(stderr,"DDD Pos %d Fish Pos =  %d Word = %S ",alive,fish_object_positions[0],fish_object[fish_object_positions[0]].word);
+			
+
+			//Using this order to say each words and letters
+			for(i=0;i<=alive;i++)
+			{
+				
+				pitch -= 10; rate-=10;
+								
+				//Adding the word
+				wcscpy(buffer,fish_object[fish_object_positions[i]].word);
+				iter = wcslen(fish_object[fish_object_positions[i]].word);
+				buffer[iter] = L'.';iter++;
+				buffer[iter] = L' ';iter++;
+				
+				//Appending letters if word is not alphabet
+				if (1<wcslen(fish_object[fish_object_positions[i]].word))
+				{
+					for(j=0;j<wcslen(fish_object[fish_object_positions[i]].word);j++)
+					{
+						buffer[iter] = fish_object[fish_object_positions[i]].word[j];iter++;
+						buffer[iter] = L'.';iter++;
+						buffer[iter] = L' ';iter++;
+					}
+				}
+				//If not ended with '\0' it will say grabage values also
+				buffer[iter] = L'\0'; 
+								
+				tts_say(rate,pitch,INTERRUPT,"%S",buffer);
+				fprintf(stderr,"\nPos %d Fish Pos =  %d Word = %S ",i,fish_object_positions[i],buffer);
+				
+				while (espeak_IsPlaying()){	}
+				SDL_Delay(50);
+			}
+			fprintf(stderr,"\n==== END ==== \n\n\n");
+				
 		}
-				
-		
-		
-		if (which != -1 && fish_object[which].alive && !fish_object[which].can_eat)
+		else
 		{
-			//Adding the word
-			wcscpy(buffer,fish_object[which].word);
-			iter = wcslen(fish_object[which].word);
-			buffer[iter] = L'.';iter++;
-			buffer[iter] = L' ';iter++;
-			
-			//Adding the remaining letters to be announced.
-			//This is as per my PAPA's suggestion (sathyan)  
-			//Eg : "BLUE. B. L. U. E"
-			
-			//Detecting the correct_position
-			correct_position = 0;
-			for(j=0;j<tux_object.wordlen;j++)
+			//Detecting the corrent typing fish
+			which = -1;
+			for (i=0;i<fishies;i++)
 			{
-				if (tux_object.word[j] == fish_object[which].word[j])
+				//Comaparing fish_object[i].splat_time;
+				if (!fish_object[i].can_eat && fish_object[i].alive)
 				{
-					correct_position+=1;
-				}
-				else
-				{
-					tux_object.wordlen = 0;
-					tux_object.word[0] = L'\n';
-					break;
+					j = wcsncmp(fish_object[i].word,tux_object.word,tux_object.wordlen);
+					if (j == 0)
+						which = i;		
 				}
 			}
-			
-			//Appending each letters from correct_position if word is not alphabet
-			if (1<wcslen(fish_object[which].word))
-			{
-				for(j=correct_position;j<wcslen(fish_object[which].word);j++)
-				{
-					//Skipping if the letter is in orange color. if not it will be appended
-					buffer[iter] = fish_object[which].word[j];iter++;
-					buffer[iter] = L'.';iter++;
-					buffer[iter] = L' ';iter++;
-				}
-			}
-			
-/*
-			for(j=0;j<wcslen(fish_object[which].word);j++)
-			{
-				if (tux_object.word[j] != fish_object[which].word[j])
-				{
-					tux_object.wordlen = 0;
-					tux_object.word[0] = L'\n';
-					//Skipping if the letter is in orange color. if not it will be appended
-					buffer[iter] = fish_object[which].word[j];iter++;
-					buffer[iter] = L'.';iter++;
-					buffer[iter] = L' ';iter++;					
-				}
-				
-			}
-*/
 
-			//If not ended with '\0' it will say grabage values also
-			buffer[iter] = L'\0'; 
-			tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",buffer);
+			if (which != -1)
+			{
+				//Adding the word
+				wcscpy(buffer,fish_object[which].word);
+				iter = wcslen(fish_object[which].word);
+				buffer[iter] = L'.';iter++;
+				buffer[iter] = L' ';iter++;
+			
+				//Adding the remaining letters to be announced.
+				//This is as per my PAPA's suggestion (sathyan)  
+				//Eg : "BLUE. B. L. U. E"
+			
+				//Detecting the correct_position
+				correct_position = 0;
+				for(j=0;j<tux_object.wordlen;j++)
+				{
+					if (tux_object.word[j] == fish_object[which].word[j])
+					{
+						correct_position+=1;
+					}
+					else
+					{
+						tux_object.wordlen = 0;
+						tux_object.word[0] = L'\n';
+						break;
+					}
+				
+				}
+				//Appending each letters from correct_position if word is not alphabet
+				if (1<wcslen(fish_object[which].word))
+				{
+					for(j=correct_position;j<wcslen(fish_object[which].word);j++)
+					{
+						//Skipping if the letter is in orange color. if not it will be appended
+						buffer[iter] = fish_object[which].word[j];iter++;
+						buffer[iter] = L'.';iter++;
+						buffer[iter] = L' ';iter++;
+					}
+				}
+				//If not ended with '\0' it will say grabage values also
+				buffer[iter] = L'\0'; 
+				
+				tts_say(rate,pitch,INTERRUPT,"%S",buffer);				
+				while (espeak_IsPlaying()){	}
+				SDL_Delay(50);
+			}
+			else
+			{
+				tux_object.wordlen = 0;
+				tux_object.word[0] = L'\n';
+			}
+		
 		}
 	}
-	
+	return 0;
 }
+
+
 /************************************************************************/
 /*                                                                      */ 
 /*         "Public" functions (callable throughout program)             */
@@ -1426,7 +1502,7 @@ static void DrawFish(int which)
       }
 
       if (k < 100000)
-        red_letters = tux_object.wordlen - j;	
+		  red_letters = tux_object.wordlen - j;
       else
         j++;
     }
