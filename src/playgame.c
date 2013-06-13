@@ -87,6 +87,13 @@ static void SpawnFishies(int diflevel, int* fishies, int* frame);
 static void UpdateTux(wchar_t letter_pressed, int fishies, int frame);
 static void WaitFrame(void);
 
+static void stop_tts_announcer()
+{
+	extern SDL_Thread *tts_announcer_thread;
+	SDL_KillThread(tts_announcer_thread);
+	tts_stop();
+}
+
 static int tts_announcer(void *struct_address)
 {
 	struct tts_announcer_cascade_data_struct struct_with_data_address = *((struct tts_announcer_cascade_data_struct*)(struct_address));
@@ -111,29 +118,25 @@ static int tts_announcer(void *struct_address)
 		
 		//Checking the typed
 		if (tux_object.wordlen == 0)
-		{
+		{	
 			//Adding the iter of each fish wich are alive and not can_eat
 			for(i=0,j=0;i<fishies;i++)
 			{
 				if (!fish_object[i].can_eat && fish_object[i].alive)
 				{
-					fprintf(stderr,"\nAdding Fish %S",fish_object[i].word);
 					fish_object_positions[j]  = i; 
 					j++;
 					pitch+=10; rate+=10;
 				}
 			}
 			alive = j-1;
-			fprintf(stderr,"\nAlive = %d",alive);
-			
 
 			//Ordering the fish_object_positions with respect to splat time		
 			if (alive != 0)
 			{
-				fprintf(stderr,"\nMore than one Alive");
-				for (i=alive;i>=0;i--)
+				for (i=alive;i>0;i--)
 				{
-					for (j=0;j<=i;j++)
+					for (j=0;j<i;j++)
 					{
 						//Comaparing fish_object[i].splat_time;
 						if (fish_object[fish_object_positions[j]].splat_time > fish_object[fish_object_positions[j+1]].splat_time)
@@ -146,11 +149,8 @@ static int tts_announcer(void *struct_address)
 				}
 			}
 			
-			else
-				fprintf(stderr,"DDD Pos %d Fish Pos =  %d Word = %S ",alive,fish_object_positions[0],fish_object[fish_object_positions[0]].word);
-			
 
-			//Using this order to say each words and letters
+			//Using this corrected order to say each words and letters
 			for(i=0;i<=alive;i++)
 			{
 				
@@ -174,9 +174,8 @@ static int tts_announcer(void *struct_address)
 				}
 				//If not ended with '\0' it will say grabage values also
 				buffer[iter] = L'\0'; 
-								
+												
 				tts_say(rate,pitch,INTERRUPT,"%S",buffer);
-				fprintf(stderr,"\nPos %d Fish Pos =  %d Word = %S ",i,fish_object_positions[i],buffer);
 				
 				while (espeak_IsPlaying()){	}
 				SDL_Delay(50);
@@ -298,8 +297,9 @@ int PlayCascade(int diflevel)
   Uint16 key_unicode;
   Uint32 last_time, now_time;
   
-  //TTS Word announcer variables
-  SDL_Thread *thread;
+  //TTS Announcer thread
+  extern SDL_Thread *tts_announcer_thread;
+
   
   //Structure which contain the address of variables 
   struct tts_announcer_cascade_data_struct struct_with_data_address;
@@ -319,7 +319,7 @@ int PlayCascade(int diflevel)
   if (settings.tts && settings.sys_sound) 
   {
 	  //Call announcer function in thread which annonces the word to type 
-	  thread = SDL_CreateThread(tts_announcer, struct_address_to_pass);
+	  tts_announcer_thread = SDL_CreateThread(tts_announcer, struct_address_to_pass);
   }
   
 
@@ -501,11 +501,11 @@ int PlayCascade(int diflevel)
                 break;
 
               case SDLK_ESCAPE:
-                SDL_KillThread(thread);
+                stop_tts_announcer();
                 
                 
                 if(settings.tts && settings.sys_sound)
-                tts_say(DEFAULT_VALUE,DEFAULT_VALUE,APPEND,"Game Paused.");
+                tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Game Paused.");
                 
                 /* Pause() returns 1 if quitting, */
                 /* 0 if returning to game:        */                
@@ -521,7 +521,7 @@ int PlayCascade(int diflevel)
 					{
 					   tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Pause Released!");
 					  //Call announcer function in thread which annonces the word to type
-					  thread = SDL_CreateThread(tts_announcer, struct_address_to_pass);
+					  tts_announcer_thread = SDL_CreateThread(tts_announcer, struct_address_to_pass);
 					}
 					
 					DrawBackground();
@@ -754,7 +754,7 @@ int PlayCascade(int diflevel)
 
   //N.x.L
   fprintf(stderr,"Exiting game");
-  SDL_KillThread(thread);
+  stop_tts_announcer();
 
 
 
