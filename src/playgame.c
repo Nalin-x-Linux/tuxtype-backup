@@ -101,7 +101,7 @@ static int tts_announcer(void *struct_address)
 	wchar_t buffer[3000];
 	int fish_object_positions[10];
 	int alive,temp;
-	int pitch,rate;
+	int pitch_and_rate;
 	int which,correct_position;
 	
 	while(1)
@@ -113,8 +113,6 @@ static int tts_announcer(void *struct_address)
 		//while (espeak_IsPlaying()){	}
 		//SDL_Delay(100);		
 		
-		rate = 40;
-		pitch = 40;
 		
 		//Checking the typed
 		if (tux_object.wordlen == 0)
@@ -126,7 +124,6 @@ static int tts_announcer(void *struct_address)
 				{
 					fish_object_positions[j]  = i; 
 					j++;
-					pitch+=10; rate+=10;
 				}
 			}
 			alive = j-1;
@@ -153,9 +150,7 @@ static int tts_announcer(void *struct_address)
 			//Using this corrected order to say each words and letters
 			for(i=0;i<=alive;i++)
 			{
-				
-				pitch -= 10; rate-=10;
-								
+												
 				//Adding the word
 				wcscpy(buffer,fish_object[fish_object_positions[i]].word);
 				iter = wcslen(fish_object[fish_object_positions[i]].word);
@@ -174,14 +169,21 @@ static int tts_announcer(void *struct_address)
 				}
 				//If not ended with '\0' it will say grabage values also
 				buffer[iter] = L'\0'; 
-												
-				tts_say(rate,pitch,INTERRUPT,"%S",buffer);
 				
+				//Setting the pitch and rate with respect to y axis
+				pitch_and_rate = ((fish_object[fish_object_positions[i]].y*100)/(screen->h - fish_sprite->frame[0]->h));
+				
+				if (pitch_and_rate < 30)
+					pitch_and_rate = 30;
+				
+				if (pitch_and_rate > 90)
+					pitch_and_rate = 90;
+				
+				tts_say(pitch_and_rate,pitch_and_rate,INTERRUPT,"%S",buffer);
+
 				while (espeak_IsPlaying()){	}
 				SDL_Delay(50);
-			}
-			fprintf(stderr,"\n==== END ==== \n\n\n");
-				
+			}				
 		}
 		else
 		{
@@ -238,9 +240,19 @@ static int tts_announcer(void *struct_address)
 					}
 				}
 				//If not ended with '\0' it will say grabage values also
-				buffer[iter] = L'\0'; 
+				buffer[iter] = L'\0';
 				
-				tts_say(rate,pitch,INTERRUPT,"%S",buffer);				
+				//Setting the pitch and rate with respect to y axis
+				pitch_and_rate = ((fish_object[fish_object_positions[i]].y*100)/(screen->h - fish_sprite->frame[0]->h));
+				
+				if (pitch_and_rate < 30)
+					pitch_and_rate = 30;
+				
+				if (pitch_and_rate > 90)
+					pitch_and_rate = 90;
+				 
+				
+				tts_say(pitch_and_rate,pitch_and_rate,INTERRUPT,"%S",buffer);				
 				while (espeak_IsPlaying()){	}
 				SDL_Delay(50);
 			}
@@ -539,7 +551,7 @@ int PlayCascade(int diflevel)
 	      case SDLK_LMETA:
               case SDLK_LSUPER:
               case SDLK_RSUPER:
-	      tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Please don't press modifier keys!");
+	      //tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Please don't press modifier keys!");
 	      break;
 
               default:
