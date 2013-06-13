@@ -79,7 +79,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MIN(x,y) ((x) < (y) ? (x) : (y))
 #define MAX(x,y) ((x) > (y) ? (x) : (y))
 
+//TTS Thread
+SDL_Thread *tts_thread;
 
+//TTS Word announcer Thread
+SDL_Thread *tts_announcer_thread;
 
 #define FNLEN	256
 

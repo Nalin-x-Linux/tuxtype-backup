@@ -46,6 +46,8 @@ void tts_set_voice(char voice_name[]){
 
 //Stop the speech if it is working
 void tts_stop(){
+	extern SDL_Thread *tts_thread;
+	SDL_KillThread(tts_thread);
 	espeak_Cancel();
 }
 
@@ -65,6 +67,8 @@ espeak_SetParameter(espeakPITCH,pitch,0);
 
 void tts_say(int rate,int pitch,int interrupt, const char* text, ...){
 	int *interrupt_address;
+	extern SDL_Thread *tts_thread;
+
 	espeak_POSITION_TYPE position_type = POS_CHARACTER;
 		
 	
@@ -91,5 +95,5 @@ void tts_say(int rate,int pitch,int interrupt, const char* text, ...){
 	espeak_Synth(out, Size, 0, position_type, 0,	espeakCHARS_AUTO,0, NULL);
 	fprintf(stderr,"\nTTS_Say : %s\n",out);
 	interrupt_address = &interrupt;
-	SDL_CreateThread(tts_thread_func, interrupt_address);
+	tts_thread = SDL_CreateThread(tts_thread_func, interrupt_address);
 }	
