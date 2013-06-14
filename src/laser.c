@@ -77,6 +77,7 @@ static int tts_announcer(void *unused)
 {
 	int lowest,lowest_y,i,iter;
 	wchar_t buffer[3000];
+	int pitch_and_rate;
 	while(1)
 	{
 		//Detecting the lowest letter and word on screen		
@@ -112,8 +113,14 @@ static int tts_announcer(void *unused)
 				buffer[iter]=comets[lowest].word[i];iter++;
 			}
 		}
-		buffer[iter] = L'\0';	
-		tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",buffer);
+		buffer[iter] = L'\0';
+
+		pitch_and_rate = ((lowest_y*100)/(screen->h - images[IMG_CITY_BLUE]->h));
+		if (pitch_and_rate < 30)
+			pitch_and_rate = 30;
+		if (pitch_and_rate > 90)
+			pitch_and_rate = 90;	
+		tts_say(pitch_and_rate,pitch_and_rate,INTERRUPT,"%S",buffer);
 		//Wait to finish saying the previus word
 		while (espeak_IsPlaying()){	}
 		SDL_Delay(1000);
