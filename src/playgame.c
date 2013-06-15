@@ -110,8 +110,8 @@ static int tts_announcer(void *struct_address)
 		fishies = *struct_with_data_address.address_of_fishies;
 
 		//Wait to finish saying the previus word
-		//while (espeak_IsPlaying()){	}
-		//SDL_Delay(100);		
+		while (espeak_IsPlaying()){	}
+		SDL_Delay(100);		
 		
 		
 		//Checking the typed
