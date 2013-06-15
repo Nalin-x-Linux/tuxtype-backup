@@ -140,6 +140,8 @@ int Phrases(wchar_t* pphrase )
   char wpm_str[20];
   char errors_str[20];
   char accuracy_str[20];
+  wchar_t tts_temp[1000];
+  int len,iter;
   SDL_Surface* tmpsurf = NULL;
 
   /* Load all needed graphics, strings, sounds.... */
@@ -165,6 +167,7 @@ int Phrases(wchar_t* pphrase )
   /* Set up positions for blitting: */
   recalc_positions();
 
+  tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",phrases[cur_phrase]);
   start = tuxtime = SDL_GetTicks();
 
 
@@ -215,7 +218,7 @@ int Phrases(wchar_t* pphrase )
         SDL_BlitSurface(errors_label_srfc, NULL, screen, &errors_label);
         SDL_BlitSurface(accuracy_label_srfc, NULL, screen, &accuracy_label);
 
-
+		
         /* Find wrapping point: */
         wrap_pt = find_next_wrap(&phrases[cur_phrase][prev_wrap],
                                   medfontsize, phrase_draw_width);
@@ -643,6 +646,41 @@ int Phrases(wchar_t* pphrase )
         {
           cursor++;
           correct_chars++;
+          
+          //Data for TTS
+          tts_temp[0] = '\0';
+          if (phrases[cur_phrase][cursor] == ' ')
+          {
+			  
+			  len = wcslen(phrases[cur_phrase]);
+			  
+			  if (pphrase == NULL)
+			  {
+				  //For phrase typing 
+				for(iter=0,i=cursor+1;i<len;i++,iter++)
+					tts_temp[iter] = phrases[cur_phrase][i];
+			  }
+			  else {
+				  //For Lesson's
+				for(iter=0,i=cursor+1;i<len;i++)
+					{
+						if(phrases[cur_phrase][i] == ' ')
+							break;
+						tts_temp[iter] = phrases[cur_phrase][i];iter++;	
+						tts_temp[iter] = ' ';iter++;
+						tts_temp[iter] = '.';iter++;							
+					}
+			  }
+			  tts_temp[iter] = '\0';
+			  tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Space %S",tts_temp);			  			  
+          }
+          else
+          {
+			  tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%c",phrases[cur_phrase][cursor]);			  
+		  }
+		  
+		  
+		  
 
           /* Handle wrapping if we are at the end of the current display. */
           /* NOTE now also checking for space at end of line so we wrap   */
@@ -739,6 +777,7 @@ int Phrases(wchar_t* pphrase )
           /* If player has completed phrase, celebrate! */
           if (cursor == wcslen(phrases[cur_phrase]))
           {
+			  tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Wow Compleated");
             /* Draw Tux celebrating: */
             {
               int done = 0;
@@ -805,6 +844,12 @@ int Phrases(wchar_t* pphrase )
             {
               wrong_chars++;
               PlaySound(wrong);
+              if (phrases[cur_phrase][cursor] == ' ')
+                tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Type Space",phrases[cur_phrase][cursor]);
+              else
+				tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Type %c",phrases[cur_phrase][cursor]);
+            
+            
             }
           }
         }
