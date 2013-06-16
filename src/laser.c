@@ -72,6 +72,17 @@ static void laser_unload_data(void);
 static void calc_city_pos(void);
 static void recalc_comet_pos(void);
 
+//Still we are not going to use this 
+static void stop_tts_announcer()
+{
+	extern SDL_Thread *tts_announcer_thread;
+	if (tts_announcer_thread)
+    {
+		SDL_KillThread(tts_announcer_thread);
+        tts_announcer_thread = NULL;
+        tts_stop();
+    }	
+}
 
 static int tts_announcer(void *unused)
 {
