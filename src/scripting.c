@@ -417,6 +417,8 @@ int XMLLesson(void)
           {
             if (loc > 0)
               loc--;
+            if (settings.tts && settings.sys_sound && settings.menu_sound) 
+				tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",script_filenames[loc]);
           }
 
           if ((event.key.keysym.sym == SDLK_DOWN)
@@ -425,6 +427,8 @@ int XMLLesson(void)
           {
             if (loc + 1 < num_scripts)
               loc++;
+            if (settings.tts && settings.sys_sound && settings.menu_sound) 
+				tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",script_filenames[loc]);              
           }
       }
     }
