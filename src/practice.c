@@ -163,11 +163,12 @@ int Phrases(wchar_t* pphrase )
   else
   {
     num_phrases = load_phrases("phrases.txt");
+    
   }
   /* Set up positions for blitting: */
   recalc_positions();
 
-  tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",phrases[cur_phrase]);
+  
   start = tuxtime = SDL_GetTicks();
 
 
@@ -195,7 +196,28 @@ int Phrases(wchar_t* pphrase )
         prev_wrap = 0;
         correct_chars = 0;
         wrong_chars = 0;
-        /* No 'break;' so we drop through to do case 1 as well : */
+        
+        if (pphrase == NULL){
+			tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",phrases[cur_phrase]);
+			 }
+		else 
+		{
+			 //For Lesson's
+			 len = wcslen(phrases[cur_phrase]);
+			 for(iter=0,i=cursor;i<len;i++)
+			 {
+				//Break if a space found
+				if(phrases[cur_phrase][i] == ' ')
+					break;
+				tts_temp[iter] = phrases[cur_phrase][i];iter++;	
+				tts_temp[iter] = '.';iter++;
+				tts_temp[iter] = ' ';iter++;							
+			 }
+			 tts_temp[iter] = '\0';
+			 tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",tts_temp);
+		 }			
+			
+      /* No 'break;' so we drop through to do case 1 as well : */
 
       /* state == 1 means complete redraw needed                          */
       /* If we do this without the case 0 resets, it means the wrap point */
@@ -656,7 +678,7 @@ int Phrases(wchar_t* pphrase )
 			  
 			  if (pphrase == NULL)
 			  {
-				  //For phrase typing 
+				//For phrase typing 
 				for(iter=0,i=cursor+1;i<len;i++,iter++)
 					tts_temp[iter] = phrases[cur_phrase][i];
 			  }
@@ -664,6 +686,7 @@ int Phrases(wchar_t* pphrase )
 				  //For Lesson's
 				for(iter=0,i=cursor+1;i<len;i++)
 					{
+						//Break if a space found
 						if(phrases[cur_phrase][i] == ' ')
 							break;
 						tts_temp[iter] = phrases[cur_phrase][i];iter++;	
@@ -676,6 +699,7 @@ int Phrases(wchar_t* pphrase )
           }
           else
           {
+			  //Next letter is not Space
 			  tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%c",phrases[cur_phrase][cursor]);			  
 		  }
 		  
@@ -777,7 +801,12 @@ int Phrases(wchar_t* pphrase )
           /* If player has completed phrase, celebrate! */
           if (cursor == wcslen(phrases[cur_phrase]))
           {
-			  tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Wow Compleated");
+			  //        time_str,chars_typed_str,cpm_str,wpm_str,errors_str,accuracy_str	
+			  
+			  tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Wow you Compleated sentence with %s charecter in \
+															%s sec time and your speed is %s word per minut and \
+															And percentage of accuracy is %s",chars_typed_str,time_str,
+															wpm_str,accuracy_str);
             /* Draw Tux celebrating: */
             {
               int done = 0;
