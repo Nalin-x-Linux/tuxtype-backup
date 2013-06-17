@@ -262,7 +262,6 @@ void TitleScreen(void)
   firstloop = 1;
   Tuxdest.y = screen->h - Tux->frame[0]->h;
 
-
   while (!done) 
   {
 
@@ -408,8 +407,6 @@ void TitleScreen(void)
               key_menu--;
               if (key_menu < 1)
                 key_menu = 5;
-              if (settings.tts && settings.sys_sound && settings.menu_sound) 
-				tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",gettext(menu_text[key_menu*5 + menu_depth]));
               break;
             }
 
@@ -422,8 +419,6 @@ void TitleScreen(void)
                 PlaySound(snd_move);
               if (key_menu > 5)
                 key_menu = 1;
-              if (settings.tts && settings.sys_sound && settings.menu_sound) 
-				tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",gettext(menu_text[key_menu*5 + menu_depth]));
               break;
             }
 
@@ -737,6 +732,8 @@ void TitleScreen(void)
       SDL_UpdateRect(screen, 0, 0, 0, 0);
 
       LOG("TitleScreen() - update_locs completed\n");
+      if (settings.tts && settings.sys_sound && settings.menu_sound) 
+	 tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",gettext(menu_text[key_menu*5 + menu_depth]));
     }
 
 
@@ -805,6 +802,8 @@ void TitleScreen(void)
       {
         REWIND(menu_gfx[key_menu][menu_depth]);
         PlaySound(snd_move);
+        if (settings.tts && settings.sys_sound && settings.menu_sound) 
+			tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",gettext(menu_text[key_menu*5 + menu_depth]));
       }
 
       SDL_BlitSurface(CurrentBkgd(), &menu_button[key_menu], screen, &menu_button[key_menu]);
