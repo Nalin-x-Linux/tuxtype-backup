@@ -197,25 +197,28 @@ int Phrases(wchar_t* pphrase )
         correct_chars = 0;
         wrong_chars = 0;
         
-        if (pphrase == NULL){
-			tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",phrases[cur_phrase]);
+        if (settings.tts && settings.sys_sound && settings.menu_sound)
+        {
+			if (pphrase == NULL){
+				tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",phrases[cur_phrase]);
 			 }
-		else 
-		{
-			 //For Lesson's
-			 len = wcslen(phrases[cur_phrase]);
-			 for(iter=0,i=cursor;i<len;i++)
-			 {
-				//Break if a space found
-				if(phrases[cur_phrase][i] == ' ')
-					break;
-				tts_temp[iter] = phrases[cur_phrase][i];iter++;	
-				tts_temp[iter] = '.';iter++;
-				tts_temp[iter] = ' ';iter++;							
-			 }
-			 tts_temp[iter] = '\0';
-			 tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",tts_temp);
-		 }			
+			else 
+			{
+				//For Lesson's
+				len = wcslen(phrases[cur_phrase]);
+				for(iter=0,i=cursor;i<len;i++)
+				{
+					//Break if a space found
+					if(phrases[cur_phrase][i] == ' ')
+						break;
+					tts_temp[iter] = phrases[cur_phrase][i];iter++;	
+					tts_temp[iter] = '.';iter++;
+					tts_temp[iter] = ' ';iter++;							
+				}
+				tts_temp[iter] = '\0';
+				tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",tts_temp);
+			}
+		}			
 			
       /* No 'break;' so we drop through to do case 1 as well : */
 
@@ -671,8 +674,8 @@ int Phrases(wchar_t* pphrase )
           
           //Data for TTS
           tts_temp[0] = '\0';
-          if (phrases[cur_phrase][cursor] == ' ')
-          {
+		  if (phrases[cur_phrase][cursor] == ' ')
+		  {
 			  
 			  len = wcslen(phrases[cur_phrase]);
 			  
@@ -696,12 +699,12 @@ int Phrases(wchar_t* pphrase )
 			  }
 			  tts_temp[iter] = '\0';
 			  tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Space %S",tts_temp);			  			  
-          }
-          else
-          {
+		 }
+		 else
+		 {
 			  //Next letter is not Space
 			  tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%c",phrases[cur_phrase][cursor]);			  
-		  }
+		 }
 		  
 		  
 		  
@@ -803,9 +806,9 @@ int Phrases(wchar_t* pphrase )
           {
 			  //        time_str,chars_typed_str,cpm_str,wpm_str,errors_str,accuracy_str	
 			  
-			  tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Wow you Compleated sentence with %s charecter in \
-															%s sec time and your speed is %s word per minut and \
-															And percentage of accuracy is %s",chars_typed_str,time_str,
+			tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Wow. you completed sentence with %s characters in \
+															%s time, your speed is %s word per minut and \
+															percentage of accuracy is %s",chars_typed_str,time_str,
 															wpm_str,accuracy_str);
             /* Draw Tux celebrating: */
             {
@@ -873,12 +876,13 @@ int Phrases(wchar_t* pphrase )
             {
               wrong_chars++;
               PlaySound(wrong);
-              if (phrases[cur_phrase][cursor] == ' ')
-                tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Type Space",phrases[cur_phrase][cursor]);
-              else
-				tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Type %c",phrases[cur_phrase][cursor]);
-            
-            
+              if (settings.tts && settings.sys_sound && settings.menu_sound)
+              {
+				  if (phrases[cur_phrase][cursor] == ' ')
+					tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Type Space",phrases[cur_phrase][cursor]);
+				  else
+					tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Type %c",phrases[cur_phrase][cursor]);
+			   }
             }
           }
         }

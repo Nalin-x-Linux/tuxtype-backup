@@ -302,14 +302,10 @@ void ChooseTheme(void)
 
         if (i == loc){
           SDL_BlitSurface(select[loc], NULL, screen, &titleRects[i%8]);
-          if (settings.tts && settings.sys_sound && settings.menu_sound)
-          {
-			  if (loc != 0)
-			    tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",themeNames[loc]);
-			  else
-			    tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"English");
-		  
-		  }
+		  if (loc != 0)
+			tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",themeNames[loc]);
+		  else
+		    tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"English");
 	     }
 	     else
 	     SDL_BlitSurface(titles[i], NULL, screen, &titleRects[i%8]);

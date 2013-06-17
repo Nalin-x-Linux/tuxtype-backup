@@ -8,6 +8,7 @@ gcc -Wall -o speak speak.c -lespeak -I/usr/include/espeak/
 #define APPEND 1
 
 #define DEFAULT 0
+#include "globals.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -47,8 +48,15 @@ void tts_set_voice(char voice_name[]){
 //Stop the speech if it is working
 void tts_stop(){
 	extern SDL_Thread *tts_thread;
-	SDL_KillThread(tts_thread);
-	espeak_Cancel();
+	if (tts_thread)
+    {
+		SDL_KillThread(tts_thread);
+		tts_thread = NULL;
+        espeak_Cancel();
+    }
+    
+	
+
 }
 
 
@@ -91,9 +99,12 @@ void tts_say(int rate,int pitch,int interrupt, const char* text, ...){
 	vsprintf(out,text,list);
 	va_end(list);
 	
-	int Size = strlen(out)+1;    
-	espeak_Synth(out, Size, 0, position_type, 0,	espeakCHARS_AUTO,0, NULL);
-	fprintf(stderr,"\nTTS_Say : %s\n",out);
-	interrupt_address = &interrupt;
-	tts_thread = SDL_CreateThread(tts_thread_func, interrupt_address);
+	int Size = strlen(out)+1; 
+	if (settings.tts && settings.sys_sound && settings.menu_sound)
+	{
+		espeak_Synth(out, Size, 0, position_type, 0,	espeakCHARS_AUTO,0, NULL);
+		fprintf(stderr,"\nTTS_Say : %s\n",out);
+		interrupt_address = &interrupt;
+		tts_thread = SDL_CreateThread(tts_thread_func, interrupt_address);
+	}
 }	
