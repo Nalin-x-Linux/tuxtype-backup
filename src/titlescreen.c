@@ -1552,8 +1552,6 @@ static int chooseWordlist(void)
           {
             if (loc > 0)
               loc--;
-            if (settings.tts && settings.sys_sound && settings.menu_sound)
-				tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",wordlistName[loc]);  
           }
 
           if ((event.key.keysym.sym == SDLK_DOWN)
@@ -1562,9 +1560,6 @@ static int chooseWordlist(void)
           {
             if (loc+1<lists)
               loc++;
-            if (settings.tts && settings.sys_sound && settings.menu_sound)
-				tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",wordlistName[loc]);
-              
           }
       }
     }
@@ -1585,6 +1580,8 @@ static int chooseWordlist(void)
         {
 			/* Draw selected text in yellow:  */
           SDL_BlitSurface(select[loc], NULL, screen, &titleRects[i%8]);
+                      if (settings.tts && settings.sys_sound && settings.menu_sound)
+				tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",wordlistName[loc]);
 
         }  
         else
