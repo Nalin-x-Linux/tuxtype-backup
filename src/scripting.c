@@ -417,8 +417,6 @@ int XMLLesson(void)
           {
             if (loc > 0)
               loc--;
-            if (settings.tts && settings.sys_sound && settings.menu_sound) 
-				tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",script_filenames[loc]);
           }
 
           if ((event.key.keysym.sym == SDLK_DOWN)
@@ -426,9 +424,7 @@ int XMLLesson(void)
 	      (event.key.keysym.sym == SDLK_j))
           {
             if (loc + 1 < num_scripts)
-              loc++;
-            if (settings.tts && settings.sys_sound && settings.menu_sound) 
-				tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",script_filenames[loc]);              
+              loc++;           
           }
       }
     }
@@ -445,10 +441,16 @@ int XMLLesson(void)
       for (i = start; i <  MIN(start + 8, num_scripts); i++) 
       {
         titleRects[i % 8].x = screen->w/2 - (titles[i]->w/2);
-        if (i == loc)   /* Draw selected text in yellow:  */
+        if (i == loc)
+        {   /* Draw selected text in yellow:  */
           SDL_BlitSurface(select[loc], NULL, screen, &titleRects[i%8]);
-        else            /* Draw unselected text in white: */
+                      if (settings.tts && settings.sys_sound && settings.menu_sound) 
+				tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",script_filenames[loc]);
+        }
+        else
+        {            /* Draw unselected text in white: */
           SDL_BlitSurface(titles[i], NULL, screen, &titleRects[i%8]);
+	    }
       }
 
       /* --- draw arrow buttons --- */
