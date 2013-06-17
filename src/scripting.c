@@ -444,8 +444,7 @@ int XMLLesson(void)
         if (i == loc)
         {   /* Draw selected text in yellow:  */
           SDL_BlitSurface(select[loc], NULL, screen, &titleRects[i%8]);
-                      if (settings.tts && settings.sys_sound && settings.menu_sound) 
-				tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",script_filenames[loc]);
+		  tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",script_filenames[loc]);
         }
         else
         {            /* Draw unselected text in white: */
@@ -1144,7 +1143,7 @@ static void run_script(void)
     int skip = 0;
     int numWavs = 0;
     int numClicks = 0;
-
+    
     curItem = curPage->items;
 
     /* --- setup background color --- */
@@ -1283,6 +1282,8 @@ static void run_script(void)
 
         case itemTEXT:
         {
+		  tts_say(DEFAULT_VALUE,DEFAULT_VALUE,APPEND,"%s",curItem->data);
+	
           SDL_Surface* img;
           SDL_Color* col;
 
@@ -1375,9 +1376,13 @@ static void run_script(void)
             }
                     
           } while (shown + 1 < strlen(curItem->data));
+          
 
           break;
+
+          
         }
+        
 
 
         case itemWAV:
@@ -1396,6 +1401,7 @@ static void run_script(void)
 
         case itemWFIN:
         {
+
           int done = 0;
 
           // Make sure everything is on screen 
@@ -1464,9 +1470,11 @@ static void run_script(void)
 
         case itemWFCH:
         {
+			
           int done = 0;
           // Make sure everything is on screen 
           SDL_Flip(screen);
+          
 
           while (!done)
           {
@@ -1544,6 +1552,8 @@ static void run_script(void)
       else
         curItem = curItem->next;
     }
+    
+    
     SDL_Flip(screen);
     SDL_Delay(30);
         
