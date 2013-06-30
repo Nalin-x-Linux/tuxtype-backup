@@ -20,3 +20,5 @@ void tts_set_volume(int volume);
 void tts_set_rate(int rate);
 void tts_set_pitch(int pitch);
 void tts_say(int rate,int pitch, int interrupt, const char* text, ...);
+void tts_wait();
+void tts_cancel();
