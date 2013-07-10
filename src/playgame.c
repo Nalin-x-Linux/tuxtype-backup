@@ -315,6 +315,10 @@ int PlayCascade(int diflevel)
   
   //TTS Announcer thread
   extern SDL_Thread *tts_announcer_thread;
+  
+  //Braille Variables
+  wchar_t pressed_letters[1000];
+  int braille_iter;
 
   
   //Structure which contain the address of variables 
@@ -462,10 +466,16 @@ int PlayCascade(int diflevel)
     }
 
     /*  --------- Begin main game loop (cycles once per frame): ------------- */
-
+	
+	
+	//Inetialising braille variables
+	braille_iter = 0;
+    pressed_letters[braille_iter] = L'\0';
+	
 
     while (playing_level)
     {
+		
       last_time = SDL_GetTicks();
 
       oldlives = curlives;
@@ -563,29 +573,61 @@ int PlayCascade(int diflevel)
               /* Some other key - player is actually typing!!!!!!!! */
               /*----------------------------------------------------*/
 
-                /* See what Unicode value was typed: */
-                key_unicode = event.key.keysym.unicode;
 
-                DEBUGCODE
-                {fprintf(stderr, "\nkey_unicode = %d\twchar_t = %lc\t\n", key_unicode, key_unicode);}
+				if(settings.braille)
+				{
+				   pressed_letters[braille_iter] = event.key.keysym.sym;
+                   braille_iter++;
+                   pressed_letters[braille_iter] = L'\0';   
+				}
+				else
+				{
+					/* See what Unicode value was typed: */
+					key_unicode = event.key.keysym.unicode;
 
-                /* For now, the cascade game is case-insensitive for input, */
-                /* with only uppercase for answers:                         */
-                if (key_unicode >= 97 && key_unicode <= 122)
-                  key_unicode -= 32;  //convert lowercase to uppercase
-                if (key_unicode >= 224 && key_unicode <= 255)
-                  key_unicode -= 32; //same for non-US Western European chars
-                if ((key_unicode >= 256) && (key_unicode <= 382))  // Fix for other letters, such as the hungarian letter O with double acute
-                    key_unicode -= 1;
+					DEBUGCODE
+					{fprintf(stderr, "\nkey_unicode = %d\twchar_t = %lc\t\n", key_unicode, key_unicode);}
 
-                LOG ("After checking for lower case:\n");
-                DEBUGCODE
-                {fprintf(stderr, "key_unicode = %d\twchar_t = %lc\\n\n", key_unicode, key_unicode);}
+					/* For now, the cascade game is case-insensitive for input, */
+					/* with only uppercase for answers:                         */
+					if (key_unicode >= 97 && key_unicode <= 122)
+					key_unicode -= 32;  //convert lowercase to uppercase
+					if (key_unicode >= 224 && key_unicode <= 255)
+					key_unicode -= 32; //same for non-US Western European chars
+					if ((key_unicode >= 256) && (key_unicode <= 382))  // Fix for other letters, such as the hungarian letter O with double acute
+						key_unicode -= 1;
+					LOG ("After checking for lower case:\n");
+					DEBUGCODE
+					{fprintf(stderr, "key_unicode = %d\twchar_t = %lc\\n\n", key_unicode, key_unicode);}
 
-                /* Now update with case-folded value: */
-                UpdateTux(key_unicode, fishies, frame);
+					/* Now update with case-folded value: */
+					UpdateTux(key_unicode, fishies, frame);
+				}
             }
           }
+          else if (event.type == SDL_KEYUP)
+			{
+				if(settings.braille)
+				{
+					wcscpy(pressed_letters,arrange_in_order(pressed_letters));
+				    if (wcscmp(pressed_letters,L"") != 0)
+				    {
+					   for(i=0;i<100;i++)
+					   {
+						   if (wcscmp(pressed_letters,braille_key_value_map[i].key) == 0)
+						   {
+							   //ans[ans_num++] = toupper(braille_key_value_map[i].value[0]);
+							   //fprintf(stderr,"\n%c",braille_key_value_map[i].value[0]);
+							   UpdateTux(toupper(braille_key_value_map[i].value[0]), fishies, frame);			   
+						   }
+					   }	   
+				   }
+				   
+				   braille_iter = 0;
+				   pressed_letters[braille_iter] = L'\0';
+			
+			  }
+			}
         }
       }   /* ------ End of 'while' loop for handling user input ------- */
 
