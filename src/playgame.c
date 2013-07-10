@@ -89,7 +89,6 @@ static void WaitFrame(void);
 
 static void stop_tts_announcer()
 {
-	extern SDL_Thread *tts_announcer_thread;
 	if (tts_announcer_thread)
     {
 		SDL_KillThread(tts_announcer_thread);
@@ -252,13 +251,13 @@ static int tts_announcer(void *struct_address)
 				if (pitch_and_rate < 30)
 					pitch_and_rate = 30;
 				
-				if (pitch_and_rate > 90)
-					pitch_and_rate = 90;
+				if (pitch_and_rate > 70)
+					pitch_and_rate = 70;
 				 
 				
 				tts_say(pitch_and_rate,pitch_and_rate,INTERRUPT,"%S",buffer);				
-				while (espeak_IsPlaying()){	}
-				SDL_Delay(50);
+				SDL_WaitThread(tts_thread,NULL);
+				SDL_Delay(100);
 			}
 			else
 			{
@@ -313,8 +312,6 @@ int PlayCascade(int diflevel)
   Uint16 key_unicode;
   Uint32 last_time, now_time;
   
-  //TTS Announcer thread
-  extern SDL_Thread *tts_announcer_thread;
   
   //Braille Variables
   wchar_t pressed_letters[1000];
@@ -616,8 +613,6 @@ int PlayCascade(int diflevel)
 					   {
 						   if (wcscmp(pressed_letters,braille_key_value_map[i].key) == 0)
 						   {
-							   //ans[ans_num++] = toupper(braille_key_value_map[i].value[0]);
-							   //fprintf(stderr,"\n%c",braille_key_value_map[i].value[0]);
 							   UpdateTux(toupper(braille_key_value_map[i].value[0]), fishies, frame);			   
 						   }
 					   }	   
