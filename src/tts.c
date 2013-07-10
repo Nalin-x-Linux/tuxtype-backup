@@ -27,7 +27,7 @@ int tts_thread_func(void *arg)
 {
 	espeak_POSITION_TYPE position_type = POS_CHARACTER;
 	tts_argument recived = *((tts_argument*)(arg));
-	fprintf(stderr,"\nSpeaking : %s - %d",recived.text,recived.interrupt);
+	fprintf(stderr,"\nSpeaking : %s with interrupt :  %d",recived.text,recived.interrupt);
 	
 	
 	if (recived.interrupt == INTERRUPT)
@@ -70,7 +70,6 @@ void tts_set_voice(char voice_name[]){
 
 //Stop the speech if it is working
 void tts_stop(){
-	extern SDL_Thread *tts_thread;
 	if (tts_thread)
     {
 		SDL_KillThread(tts_thread);
@@ -94,16 +93,15 @@ espeak_SetParameter(espeakPITCH,pitch,0);
 }
 
 void tts_say(int rate,int pitch,int interrupt, const char* text, ...){
-	extern SDL_Thread *tts_thread;
 	tts_argument data_to_pass;
 	
 	//Setting given rate if rate != 0
-	if (rate != DEFAULT_VALUE)
-	T4K_Tts_set_rate(rate);
+	//if (rate != DEFAULT_VALUE)
+	//T4K_Tts_set_rate(rate);
 
     //Setting pitch rate if rate != 0
-    if (pitch != DEFAULT_VALUE)
-    T4K_Tts_set_pitch(pitch);
+    //if (pitch != DEFAULT_VALUE)
+    //T4K_Tts_set_pitch(pitch);
 
 	//Getting the formated text
 	char to_say[1000];

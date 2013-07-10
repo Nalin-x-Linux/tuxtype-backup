@@ -75,7 +75,6 @@ static void recalc_comet_pos(void);
 //Still we are not going to use this 
 static void stop_tts_announcer()
 {
-	extern SDL_Thread *tts_announcer_thread;
 	if (tts_announcer_thread)
     {
 		SDL_KillThread(tts_announcer_thread);
@@ -124,17 +123,20 @@ static int tts_announcer(void *unused)
 				buffer[iter]=comets[lowest].word[i];iter++;
 			}
 		}
+		buffer[iter]=L'.';iter++;
+		buffer[iter]=L' ';iter++;		
 		buffer[iter] = L'\0';
 
 		pitch_and_rate = ((lowest_y*100)/(screen->h - images[IMG_CITY_BLUE]->h));
 		if (pitch_and_rate < 30)
 			pitch_and_rate = 30;
-		if (pitch_and_rate > 90)
-			pitch_and_rate = 90;	
+		if (pitch_and_rate > 70)
+			pitch_and_rate = 70;	
 		tts_say(pitch_and_rate,pitch_and_rate,INTERRUPT,"%S",buffer);
+		
 		//Wait to finish saying the previus word
-		while (espeak_IsPlaying()){	}
-		SDL_Delay(1000);
+		SDL_WaitThread(tts_thread,NULL);
+		SDL_Delay(100);
 			
 	}
 	return 1;
