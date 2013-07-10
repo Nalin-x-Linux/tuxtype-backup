@@ -102,6 +102,7 @@ typedef struct game_option_type{
   int use_english;
   int fullscreen;
   int sys_sound;
+  int braille;
   int tts;
   int tts_volume;
   int sfx_volume;
@@ -116,6 +117,12 @@ typedef struct game_option_type{
   int hidden; // Read the README file in the image directory for info on this ;)
 } game_option_type;
 
+struct braille_dict
+{
+	wchar_t key[100];
+	wchar_t value[100];
+}braille_key_value_map[100];;
+
 
 /* Default values for game_option_type struct */
 /* They can be changed in the struct to other values at run-time */
@@ -126,6 +133,7 @@ typedef struct game_option_type{
 #define DEFAULT_LOCALE	        "en_US.UTF-8"
 #define DEFAULT_USE_ENGLISH 1
 #define DEFAULT_FULLSCREEN 1
+#define DEFAULT_BRAILLE 0
 #define DEFAULT_TTS 1
 #define DEFAULT_TTS_VOLUME 100
 #define DEFAULT_SYS_SOUND 1
