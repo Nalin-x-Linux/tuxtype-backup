@@ -162,6 +162,9 @@ int PlayLaserGame(int diff_level)
 	//TTS Word announcer variables
 	SDL_Thread *thread;
 
+	//Braille Variables
+	wchar_t pressed_letters[1000];
+	int braille_iter;
 
 	Uint16 key_unicode;
 
@@ -243,6 +246,9 @@ int PlayLaserGame(int diff_level)
 	  thread = SDL_CreateThread(tts_announcer, NULL);
 	}	
 	
+	//Inetialising braille variables
+	braille_iter = 0;
+    pressed_letters[braille_iter] = L'\0';
 
 	do {
 
@@ -260,7 +266,9 @@ int PlayLaserGame(int diff_level)
 				/* Window close event - quit! */
 				exit(0);
 	      
-			} else if (event.type == SDL_KEYDOWN) {
+			}
+			else if (event.type == SDL_KEYDOWN)
+			{
 
 				key = event.key.keysym.sym;
 				if (key == SDLK_F10) 
@@ -302,9 +310,40 @@ int PlayLaserGame(int diff_level)
 				  fprintf(stderr,
                                    "key_unicode = %d\n", key_unicode);
 				}
-				/* Now update with case-folded value: */
-				ans[ans_num++] = key_unicode;
-
+				
+				if(settings.braille)
+				{
+				   pressed_letters[braille_iter] = event.key.keysym.sym;
+                   braille_iter++;
+                   pressed_letters[braille_iter] = L'\0';   
+				}
+				else
+				{
+					/* Now update with case-folded value: */
+					ans[ans_num++] = key_unicode;
+				}
+			}
+			else if (event.type == SDL_KEYUP)
+			{
+				if(settings.braille)
+				{
+					wcscpy(pressed_letters,arrange_in_order(pressed_letters));
+				    if (wcscmp(pressed_letters,L"") != 0)
+				    {
+					   for(i=0;i<100;i++)
+					   {
+						   if (wcscmp(pressed_letters,braille_key_value_map[i].key) == 0)
+						   {
+							   ans[ans_num++] = toupper(braille_key_value_map[i].value[0]);
+							   //fprintf(stderr,"\n%c",braille_key_value_map[i].value[0]);			   
+						   }
+					   }	   
+				   }
+				   
+				   braille_iter = 0;
+				   pressed_letters[braille_iter] = L'\0';
+			
+			  }
 			}
 		}
       
