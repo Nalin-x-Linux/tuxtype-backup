@@ -667,12 +667,13 @@ int Phrases(wchar_t* pphrase )
 			/* ----- SDL_KEYUP is Only for Braille Mode -------------*/
 			if(settings.braille)
 			{
+				/* ---- g will make next letter capital ----------*/ 
 				if (wcscmp(pressed_letters,L"g") == 0)
 					braille_capital = 1;
 				
 				if (wcscmp(pressed_letters,L" ") != 0)
 				{
-					
+					/* ------ Check pressed_letters which is not space --------*/
 					wcscpy(pressed_letters,arrange_in_order(pressed_letters));
 					if (wcscmp(pressed_letters,L"") != 0)
 					{
@@ -690,13 +691,18 @@ int Phrases(wchar_t* pphrase )
 							}
 						}	   
 					}
+					
+					/* --- Preventing the checking of Remaining KEYUP events --- */ 
 					else
 					{
 						check_key = 0;
-					}								
+					}
+					
+					/* --- Clearing the pressed_letters to prevent other events */								
 					braille_iter = 0;
 					pressed_letters[braille_iter] = L'\0';
 				}
+				/* --------- Space is always space :) -----------------*/ 
 				else
 				{
 					tmp = L' ';
@@ -706,12 +712,8 @@ int Phrases(wchar_t* pphrase )
 		}
 		/* End of "if(event.type == SDL_KEYUP)" block  --*/
 		
-		
 		if((check_key && event.type == SDL_KEYDOWN)  || (check_key && event.type == SDL_KEYUP && settings.braille))
 		{
-		
-		//Code Moved Begin
-
         /* If state has changed as direct result of keypress (e.g. F10), leave */
         /* poll event loop so we don't treat it as a simple 'wrong' key: */
         if (state == 0
@@ -971,11 +973,6 @@ int Phrases(wchar_t* pphrase )
           }
         }
 	}
-
-//Code moved end
-
-
-
 
     }  /* ----- End of SDL_PollEvent() loop -------------- */
 
