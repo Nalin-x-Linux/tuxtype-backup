@@ -112,9 +112,12 @@ static int tts_announcer(void *struct_address)
 		//Converting and taking the value of fishies from void address structure 
 		fishies = *struct_with_data_address.address_of_fishies;
 
-		//Wait to finish saying the previus word
-		while (espeak_IsPlaying()){	}
-		SDL_Delay(100);		
+		//Wait to finish saying the previus word	
+		
+		tts_wait();
+		
+		//SDL_WaitThread(tts_thread,NULL);
+		//SDL_Delay(100);	
 		
 		
 		//Checking the typed
@@ -184,8 +187,8 @@ static int tts_announcer(void *struct_address)
 				
 				tts_say(pitch_and_rate,pitch_and_rate,INTERRUPT,"%S",buffer);
 
-				while (espeak_IsPlaying()){	}
-				SDL_Delay(50);
+				SDL_WaitThread(tts_thread,NULL);
+				SDL_Delay(100);
 			}				
 		}
 		else
@@ -246,7 +249,7 @@ static int tts_announcer(void *struct_address)
 				buffer[iter] = L'\0';
 				
 				//Setting the pitch and rate with respect to y axis
-				pitch_and_rate = ((fish_object[fish_object_positions[i]].y*100)/(screen->h - fish_sprite->frame[0]->h));
+				pitch_and_rate = ((fish_object[which].y*100)/(screen->h - fish_sprite->frame[0]->h));
 				
 				if (pitch_and_rate < 30)
 					pitch_and_rate = 30;
