@@ -144,6 +144,17 @@ int Phrases(wchar_t* pphrase )
   int len,iter;
   SDL_Surface* tmpsurf = NULL;
 
+  //Braille Variables
+  wchar_t pressed_letters[1000];
+  int braille_iter;
+  int braille_capital;
+
+	//Moved by N.x.L
+	int key;
+	char tmp;
+	int shift_pressed;
+	int check_key;
+
   /* Load all needed graphics, strings, sounds.... */
   if (!practice_load_media())
   {
@@ -218,7 +229,11 @@ int Phrases(wchar_t* pphrase )
 				tts_temp[iter] = '\0';
 				tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",tts_temp);
 			}
-		}			
+		}
+		
+		  //Inetialising braille variables
+		  braille_iter = 0;
+		  pressed_letters[braille_iter] = L'\0';			
 			
       /* No 'break;' so we drop through to do case 1 as well : */
 
@@ -409,14 +424,16 @@ int Phrases(wchar_t* pphrase )
 
     /* This blits the next character onto the screen in a large font: */
     display_next_letter(phrases[cur_phrase], cursor);
-
+    
+	
     while  (SDL_PollEvent(&event))
     {
+		
       if (event.type == SDL_KEYDOWN)
       {
-        int key = GetIndex((wchar_t)event.key.keysym.unicode);
-        int shift_pressed = event.key.keysym.mod&KMOD_SHIFT;
-        char tmp = -1;
+        key = GetIndex((wchar_t)event.key.keysym.unicode);
+        shift_pressed = event.key.keysym.mod&KMOD_SHIFT;
+        tmp = -1;
 
         /* TODO I must be missing something - why aren't we just looking at */
         /* the event.key.keysym.unicode value instead of going through this */
@@ -631,6 +648,69 @@ int Phrases(wchar_t* pphrase )
           /* ignore other keys: */
           default: break;
         }
+        
+        if(settings.braille)
+		{
+		   pressed_letters[braille_iter] = event.key.keysym.sym;
+           braille_iter++;
+           pressed_letters[braille_iter] = L'\0';
+           check_key = 0;
+		}
+		else
+		{
+			check_key = 1;
+		}
+      } 
+      /* End of "if(event.type == SDL_KEYDOWN)" block  --*/
+      else if (event.type == SDL_KEYUP)
+		{
+			/* ----- SDL_KEYUP is Only for Braille Mode -------------*/
+			if(settings.braille)
+			{
+				if (wcscmp(pressed_letters,L"g") == 0)
+					braille_capital = 1;
+				
+				if (wcscmp(pressed_letters,L" ") != 0)
+				{
+					
+					wcscpy(pressed_letters,arrange_in_order(pressed_letters));
+					if (wcscmp(pressed_letters,L"") != 0)
+					{
+						for(i=0;i<100;i++)
+						{
+							if (wcscmp(pressed_letters,braille_key_value_map[i].key) == 0)
+							{
+								tmp = braille_key_value_map[i].value[0];
+								check_key = 1;
+								if (braille_capital)
+									{
+										shift_pressed = 1;
+										braille_capital = 0;
+									}
+							}
+						}	   
+					}
+					else
+					{
+						check_key = 0;
+					}								
+					braille_iter = 0;
+					pressed_letters[braille_iter] = L'\0';
+				}
+				else
+				{
+					tmp = L' ';
+					check_key = 1;
+				}
+			}
+		}
+		/* End of "if(event.type == SDL_KEYUP)" block  --*/
+		
+		
+		if((check_key && event.type == SDL_KEYDOWN)  || (check_key && event.type == SDL_KEYUP && settings.braille))
+		{
+		
+		//Code Moved Begin
 
         /* If state has changed as direct result of keypress (e.g. F10), leave */
         /* poll event loop so we don't treat it as a simple 'wrong' key: */
@@ -641,6 +721,7 @@ int Phrases(wchar_t* pphrase )
         /* Change to uppercase if shift used */
         if(shift_pressed)
           tmp=toupper(tmp);
+          
 
         if ( key != -1 ) 
           updatekeylist(key,tmp);
@@ -667,11 +748,13 @@ int Phrases(wchar_t* pphrase )
 
         /****************************************************/
         /*  ---------- If user typed correct character, handle it: --------------- */
-        if (phrases[cur_phrase][cursor] == event.key.keysym.unicode)
+        if (phrases[cur_phrase][cursor] == event.key.keysym.unicode || (settings.braille && phrases[cur_phrase][cursor] == tmp))
         {
           cursor++;
           correct_chars++;
           
+          
+          /* --------- Announcing the next letter to Type --------------------------*/
           //Data for TTS
           tts_temp[0] = '\0';
 		  if (phrases[cur_phrase][cursor] == ' ')
@@ -699,12 +782,12 @@ int Phrases(wchar_t* pphrase )
 			  }
 			  tts_temp[iter] = '\0';
 			  tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Space %S",tts_temp);			  			  
-		 }
-		 else
-		 {
+		   }
+		   else
+		   {
 			  //Next letter is not Space
 			  tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%c",phrases[cur_phrase][cursor]);			  
-		 }
+		   }
 		  
 		  
 		  
@@ -850,7 +933,8 @@ int Phrases(wchar_t* pphrase )
             state = 0;
           }
         }
-        else  /* -------- handle incorrect key press: -------------*/
+        /* -------- handle incorrect key press: -------------*/
+        else  if (check_key)
         {
           // int key = GetIndex((wchar_t)event.key.keysym.unicode);
           if ( key != -1 ) 
@@ -886,8 +970,12 @@ int Phrases(wchar_t* pphrase )
             }
           }
         }
-        
-      } /* End of "if(event.type == SDL_KEYDOWN)" block  --*/
+	}
+
+//Code moved end
+
+
+
 
     }  /* ----- End of SDL_PollEvent() loop -------------- */
 
