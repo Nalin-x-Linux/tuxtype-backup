@@ -81,6 +81,8 @@ int main(int argc, char *argv[])
         fprintf(stderr, "\n\t\tEnable in-game accessibility");
         fprintf(stderr, "\n\n\t-na, --notts");
         fprintf(stderr, "\n\t\tDisables in-game accessibility");
+        fprintf(stderr, "\n\n\t-b, --braille");
+        fprintf(stderr, "\n\t\tEnable Braille Mode");
         fprintf(stderr, "\n\n\t-t {THEME}, --theme {THEME}");
         fprintf(stderr, "\n\t\tUse theme named {THEME}, if it exists");
         fprintf(stderr, "\n\n\t-sp, --speed");
@@ -135,6 +137,10 @@ int main(int argc, char *argv[])
       if (  (strcmp(argv[i], "-na") == 0)
          || (strcmp(argv[i], "--notts") == 0))
         settings.tts = 0;
+
+      if (  (strcmp(argv[i], "-b") == 0)
+         || (strcmp(argv[i], "--braille") == 0))
+        settings.braille = 1;
 
       if (  (strcmp(argv[i], "--hidden") == 0)
          || (strcmp(argv[i], "-hidden") == 0))
@@ -194,6 +200,11 @@ int main(int argc, char *argv[])
 	  //Initialising TTS
 	  tts_init();
 	  tts_set_volume(settings.tts_volume);
+  }
+  
+  if (settings.braille)
+  {
+	braille_language_loader("/home/linux/english.txt");
   }
   
   /* FIXME: we should check config files/environment variables like LANG! */
