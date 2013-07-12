@@ -30,7 +30,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* non-local functions are visible throughout the program.               */ 
 
 #include "SDL_extras.h"
-#include "tts.h"
 /* (still in alphabet.c:) */
 int CheckNeededGlyphs(void);
 void ClearWordList(void);

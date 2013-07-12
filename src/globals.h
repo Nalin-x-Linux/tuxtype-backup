@@ -26,6 +26,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 
+//TTS Parameters
+#define DEFAULT_VALUE 0
+#define INTERRUPT 0
+#define APPEND 1
 
 #ifndef GLOBALS_H
 #define GLOBALS_H
@@ -121,7 +125,7 @@ struct braille_dict
 {
 	wchar_t key[100];
 	wchar_t value[100];
-}braille_key_value_map[100];;
+}braille_key_value_map[100];
 
 
 /* Default values for game_option_type struct */

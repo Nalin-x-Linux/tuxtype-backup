@@ -82,7 +82,6 @@ tuxtype_SOURCES = 	\
 	snow.c		\
 	theme.c		\
 	titlescreen.c	\
-	tts.c		\
 	braille.c
 TuxType_SOURCES  = $(tuxtype_SOURCES)
 
@@ -106,5 +105,4 @@ EXTRA_DIST =		\
 	SDL_extras.h	\
 	snow.h		\
         titlescreen.h	\
-	tts.h		\
 	braille.h
