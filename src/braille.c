@@ -31,7 +31,10 @@ int braille_language_loader(char* language)
 {
 	int iter = 0;
 	FILE *fp;
-	fp = fopen(language,"r");
+	char file[100];
+	
+	sprintf(file , "%s/braille/%s", settings.default_data_path,language);
+	fp = fopen(file,"r");
 	
 	if(fp == NULL)
 		return 0;

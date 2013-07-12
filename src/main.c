@@ -204,7 +204,7 @@ int main(int argc, char *argv[])
   
   if (settings.braille)
   {
-	braille_language_loader("/home/linux/english.txt");
+	braille_language_loader("english.txt");
   }
   
   /* FIXME: we should check config files/environment variables like LANG! */
