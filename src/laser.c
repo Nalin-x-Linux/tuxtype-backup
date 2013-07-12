@@ -79,7 +79,7 @@ static void stop_tts_announcer()
     {
 		SDL_KillThread(tts_announcer_thread);
         tts_announcer_thread = NULL;
-        tts_stop();
+        T4K_Tts_stop();
     }	
 }
 
@@ -132,7 +132,7 @@ static int tts_announcer(void *unused)
 			pitch_and_rate = 30;
 		if (pitch_and_rate > 70)
 			pitch_and_rate = 70;	
-		tts_say(pitch_and_rate,pitch_and_rate,INTERRUPT,"%S",buffer);
+		T4K_Tts_say(pitch_and_rate,pitch_and_rate,INTERRUPT,"%S",buffer);
 		
 		//Wait to finish saying the previus word
 		SDL_WaitThread(tts_thread,NULL);
@@ -766,11 +766,11 @@ int PlayLaserGame(int diff_level)
 
 		if (paused) {
 			SDL_KillThread(thread);
-			tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Game Paused!");
+			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Game Paused!");
 			quit = Pause();
 			if(settings.tts && settings.sys_sound && quit == 0)
 				{
-					tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Pause Released!");
+					T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Pause Released!");
 					SDL_Delay(700);
 					//Call announcer function in thread which annonces the word to type
 					thread = SDL_CreateThread(tts_announcer, NULL);

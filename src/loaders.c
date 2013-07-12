@@ -111,7 +111,7 @@ void LoadLang(void)
   if (settings.tts)
   {
 	  sprintf(tts_language,"%.*s",2,buf);
-	  tts_set_voice(tts_language);
+	  T4K_Tts_set_voice(tts_language);
   }
   
 

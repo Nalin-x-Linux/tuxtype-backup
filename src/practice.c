@@ -211,7 +211,7 @@ int Phrases(wchar_t* pphrase )
         if (settings.tts && settings.sys_sound && settings.menu_sound)
         {
 			if (pphrase == NULL){
-				tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",phrases[cur_phrase]);
+				T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",phrases[cur_phrase]);
 			 }
 			else 
 			{
@@ -227,7 +227,7 @@ int Phrases(wchar_t* pphrase )
 					tts_temp[iter] = ' ';iter++;							
 				}
 				tts_temp[iter] = '\0';
-				tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",tts_temp);
+				T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",tts_temp);
 			}
 		}
 		
@@ -783,12 +783,12 @@ int Phrases(wchar_t* pphrase )
 					}
 			  }
 			  tts_temp[iter] = '\0';
-			  tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Space %S",tts_temp);			  			  
+			  T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Space %S",tts_temp);			  			  
 		   }
 		   else
 		   {
 			  //Next letter is not Space
-			  tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%c",phrases[cur_phrase][cursor]);			  
+			  T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%c",phrases[cur_phrase][cursor]);			  
 		   }
 		  
 		  
@@ -891,7 +891,7 @@ int Phrases(wchar_t* pphrase )
           {
 			  //        time_str,chars_typed_str,cpm_str,wpm_str,errors_str,accuracy_str	
 			  
-			tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Wow. you completed sentence with %s characters in \
+			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Wow. you completed sentence with %s characters in \
 															%s time, your speed is %s word per minut and \
 															percentage of accuracy is %s",chars_typed_str,time_str,
 															wpm_str,accuracy_str);
@@ -965,9 +965,9 @@ int Phrases(wchar_t* pphrase )
               if (settings.tts && settings.sys_sound && settings.menu_sound)
               {
 				  if (phrases[cur_phrase][cursor] == ' ')
-					tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Type Space",phrases[cur_phrase][cursor]);
+					T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Type Space",phrases[cur_phrase][cursor]);
 				  else
-					tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Type %c",phrases[cur_phrase][cursor]);
+					T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Type %c",phrases[cur_phrase][cursor]);
 			   }
             }
           }

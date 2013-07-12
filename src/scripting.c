@@ -444,7 +444,7 @@ int XMLLesson(void)
         if (i == loc)
         {   /* Draw selected text in yellow:  */
           SDL_BlitSurface(select[loc], NULL, screen, &titleRects[i%8]);
-		  tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",script_filenames[loc]);
+		  T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",script_filenames[loc]);
         }
         else
         {            /* Draw unselected text in white: */
@@ -1282,7 +1282,7 @@ static void run_script(void)
 
         case itemTEXT:
         {
-		  tts_say(DEFAULT_VALUE,DEFAULT_VALUE,APPEND,"%s",curItem->data);
+		  T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,APPEND,"%s",curItem->data);
 	
           SDL_Surface* img;
           SDL_Color* col;

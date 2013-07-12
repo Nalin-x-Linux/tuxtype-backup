@@ -93,7 +93,7 @@ static void stop_tts_announcer()
     {
 		SDL_KillThread(tts_announcer_thread);
         tts_announcer_thread = NULL;
-        tts_stop();
+        T4K_Tts_stop();
     }	
 }
 
@@ -114,7 +114,7 @@ static int tts_announcer(void *struct_address)
 
 		//Wait to finish saying the previus word	
 		
-		tts_wait();
+		T4K_Tts_wait();
 		
 		//SDL_WaitThread(tts_thread,NULL);
 		//SDL_Delay(100);	
@@ -185,7 +185,7 @@ static int tts_announcer(void *struct_address)
 				if (pitch_and_rate > 90)
 					pitch_and_rate = 90;
 				
-				tts_say(pitch_and_rate,pitch_and_rate,INTERRUPT,"%S",buffer);
+				T4K_Tts_say(pitch_and_rate,pitch_and_rate,INTERRUPT,"%S",buffer);
 
 				SDL_WaitThread(tts_thread,NULL);
 				SDL_Delay(100);
@@ -258,7 +258,7 @@ static int tts_announcer(void *struct_address)
 					pitch_and_rate = 70;
 				 
 				
-				tts_say(pitch_and_rate,pitch_and_rate,INTERRUPT,"%S",buffer);				
+				T4K_Tts_say(pitch_and_rate,pitch_and_rate,INTERRUPT,"%S",buffer);				
 				SDL_WaitThread(tts_thread,NULL);
 				SDL_Delay(100);
 			}
@@ -531,7 +531,7 @@ int PlayCascade(int diflevel)
                 
                 
                 if(settings.tts && settings.sys_sound)
-                tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Game Paused.");
+                T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Game Paused.");
                 
                 /* Pause() returns 1 if quitting, */
                 /* 0 if returning to game:        */                
@@ -545,7 +545,7 @@ int PlayCascade(int diflevel)
                 {
 					if(settings.tts && settings.sys_sound)
 					{
-					   tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Pause Released!");
+					   T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Pause Released!");
 					  //Call announcer function in thread which annonces the word to type
 					  tts_announcer_thread = SDL_CreateThread(tts_announcer, struct_address_to_pass);
 					}
@@ -565,7 +565,7 @@ int PlayCascade(int diflevel)
 	      case SDLK_LMETA:
               case SDLK_LSUPER:
               case SDLK_RSUPER:
-	      //tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Please don't press modifier keys!");
+	      //T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Please don't press modifier keys!");
 	      break;
 
               default:

@@ -303,9 +303,9 @@ void ChooseTheme(void)
         if (i == loc){
           SDL_BlitSurface(select[loc], NULL, screen, &titleRects[i%8]);
 		  if (loc != 0)
-			tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",themeNames[loc]);
+			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",themeNames[loc]);
 		  else
-		    tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"English");
+		    T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"English");
 	     }
 	     else
 	     SDL_BlitSurface(titles[i], NULL, screen, &titleRects[i%8]);

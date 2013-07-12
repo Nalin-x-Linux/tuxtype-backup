@@ -198,8 +198,8 @@ int main(int argc, char *argv[])
   if (settings.tts)
   {
 	  //Initialising TTS
-	  tts_init();
-	  tts_set_volume(settings.tts_volume);
+	  T4K_Tts_init();
+	  T4K_Tts_set_volume(settings.tts_volume);
   }
   
   if (settings.braille)
