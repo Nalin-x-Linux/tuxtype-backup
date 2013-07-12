@@ -401,6 +401,7 @@ AC_CONFIG_FILES([Makefile
 tuxtype.spec
 tuxtype_preview.spec
 data/Makefile
+data/braille/Makefile
 data/fonts/Makefile
 data/im/Makefile
 data/images/Makefile
