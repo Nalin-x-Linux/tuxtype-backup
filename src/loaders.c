@@ -114,6 +114,17 @@ void LoadLang(void)
 	  T4K_Tts_set_voice(tts_language);
   }
   
+  if (settings.braille)
+  {
+	  char file_name[100];
+	  if(settings.use_english){
+			sprintf(file_name,"english.txt");
+	  }
+	  else{
+		  sprintf(file_name,"%s.txt",settings.theme_name);
+	  }
+	  braille_language_loader(file_name);
+  }
 
   if (my_setenv("LANG", buf) == -1)
   {
