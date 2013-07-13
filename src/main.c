@@ -202,11 +202,6 @@ int main(int argc, char *argv[])
 	  T4K_Tts_set_volume(settings.tts_volume);
   }
   
-  if (settings.braille)
-  {
-	braille_language_loader("english.txt");
-  }
-  
   /* FIXME: we should check config files/environment variables like LANG! */
   /* NOTE what should we do if LANG is something without a theme - should */
   /* we then default to English?                                          */
