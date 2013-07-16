@@ -71,7 +71,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define YIPE_ONSCREEN		2
 
 //fishy defs
-#define MAX_FISHIES_EASY	15
+#define MAX_FISHIES_EASY	1
 #define MAX_FISHIES_MEDIUM	30
 #define MAX_FISHIES_HARD	40
 #define MAX_FISHIES_DIGITS	2
@@ -89,7 +89,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define FISH_SPACING_MEDIUM  40
 #define FISH_SPACING_HARD    30
 
-#define LIVES_INIT_EASY      5
+#define LIVES_INIT_EASY      1
 #define LIVES_INIT_MEDIUM    7
 #define LIVES_INIT_HARD      9
 

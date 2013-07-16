@@ -87,13 +87,14 @@ static void SpawnFishies(int diflevel, int* fishies, int* frame);
 static void UpdateTux(wchar_t letter_pressed, int fishies, int frame);
 static void WaitFrame(void);
 
+static int tts_announcer_exit = 0;
+
+
 static void stop_tts_announcer()
 {
 	if (tts_announcer_thread)
     {
-		SDL_KillThread(tts_announcer_thread);
-        tts_announcer_thread = NULL;
-        T4K_Tts_stop();
+		tts_announcer_exit = 1;
     }	
 }
 
@@ -106,18 +107,22 @@ static int tts_announcer(void *struct_address)
 	int alive,temp;
 	int pitch_and_rate;
 	int which,correct_position;
+	tts_announcer_exit = 0;
 	
 	while(1)
 	{
+		
+		
 		//Converting and taking the value of fishies from void address structure 
 		fishies = *struct_with_data_address.address_of_fishies;
-
+		
+		if(tts_announcer_exit)
+			goto end;
+		
+		
 		//Wait to finish saying the previus word	
 		
 		T4K_Tts_wait();
-		
-		//SDL_WaitThread(tts_thread,NULL);
-		//SDL_Delay(100);	
 		
 		
 		//Checking the typed
@@ -156,6 +161,8 @@ static int tts_announcer(void *struct_address)
 			//Using this corrected order to say each words and letters
 			for(i=0;i<=alive;i++)
 			{
+				if(tts_announcer_exit)
+					goto end;
 												
 				//Adding the word
 				wcscpy(buffer,fish_object[fish_object_positions[i]].word);
@@ -229,7 +236,7 @@ static int tts_announcer(void *struct_address)
 					else
 					{
 						tux_object.wordlen = 0;
-						tux_object.word[0] = L'\n';
+						tux_object.word[0] = L'\0';
 						break;
 					}
 				
@@ -265,11 +272,12 @@ static int tts_announcer(void *struct_address)
 			else
 			{
 				tux_object.wordlen = 0;
-				tux_object.word[0] = L'\n';
+				tux_object.word[0] = L'\0';
 			}
 		
 		}
 	}
+	end:
 	return 0;
 }
 
@@ -287,6 +295,7 @@ int PlayCascade(int diflevel)
 {
   char filename[FNLEN];
   int still_playing = 1;
+  int tts_announcer_exit=0;
   int playing_level = 1;
   int setup_new_level = 1;
   int won_level = 0;
@@ -320,26 +329,20 @@ int PlayCascade(int diflevel)
   wchar_t pressed_letters[1000];
   int braille_iter;
 
-  
+
+  //Structure which contain the address of above struct 
+  //Why ? : Only one argument can be passed through thread    
   //Structure which contain the address of variables 
   struct tts_announcer_cascade_data_struct struct_with_data_address;
   
   //Giving address of variables
   struct_with_data_address.address_of_fishies = &fishies;
-  
-  
-  //Structure which contain the address of above struct 
-  //Why ? : Only one argument can be passed through thread  
-  struct tts_announcer_cascade_data_struct *struct_address_to_pass;
-  
-  //Setting the address
-  struct_address_to_pass = &struct_with_data_address;
-  
-  
+
+
   if (settings.tts && settings.sys_sound) 
   {
 	  //Call announcer function in thread which annonces the word to type 
-	  tts_announcer_thread = SDL_CreateThread(tts_announcer, struct_address_to_pass);
+	  tts_announcer_thread = SDL_CreateThread(tts_announcer, &struct_with_data_address);
   }
   
 
@@ -527,11 +530,13 @@ int PlayCascade(int diflevel)
                 break;
 
               case SDLK_ESCAPE:
-                stop_tts_announcer();
-                
-                
                 if(settings.tts && settings.sys_sound)
-                T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Game Paused.");
+                {
+					//SDL_WaitThread(tts_thread,NULL);
+					//SDL_Delay(100);
+					stop_tts_announcer();
+					T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Game Paused.");
+				}
                 
                 /* Pause() returns 1 if quitting, */
                 /* 0 if returning to game:        */                
@@ -547,7 +552,8 @@ int PlayCascade(int diflevel)
 					{
 					   T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Pause Released!");
 					  //Call announcer function in thread which annonces the word to type
-					  tts_announcer_thread = SDL_CreateThread(tts_announcer, struct_address_to_pass);
+					  tts_announcer_exit = 0;
+					  tts_announcer_thread = SDL_CreateThread(tts_announcer, &struct_with_data_address);
 					}
 					
 					DrawBackground();
@@ -713,6 +719,12 @@ int PlayCascade(int diflevel)
       /* Level completed successfully: */
       if (won_level) 
       {
+		if (settings.tts)
+			stop_tts_announcer();
+  
+        if (settings.sys_sound) 
+          Mix_PlayChannel(WIN_WAV, sound[WIN_WAV], 0);
+
         if (curlevel < 4)  /* Advance to next level */
         {
           LOG( "--->NEXT LEVEL!\n" );
@@ -721,6 +733,12 @@ int PlayCascade(int diflevel)
           xamp = 0;
           yamp = 0;
           won_level = 0;
+          if (settings.tts)
+          {
+			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Congratulation! Welcome to level %d!",curlevel+1);
+			tts_announcer_thread = SDL_CreateThread(tts_announcer, &struct_with_data_address);
+			}
+			
         }
         else
         {
@@ -729,13 +747,9 @@ int PlayCascade(int diflevel)
           still_playing = 0;
           xamp = WIN_GAME_XAMP;
           yamp = WIN_GAME_YAMP;
-
-          if (settings.sys_sound) 
-            Mix_PlayChannel(WINFINAL_WAV, sound[WINFINAL_WAV], 0);
+          if (settings.tts)
+			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Congratulations! Bye");          
         }
-
-        if (settings.sys_sound) 
-          Mix_PlayChannel(WIN_WAV, sound[WIN_WAV], 0);
 
         for (i = 0; i < CONGRATS_FRAMES; i++)
           temp_text[i] = congrats[i];
@@ -753,6 +767,12 @@ int PlayCascade(int diflevel)
 
         if (settings.sys_sound)
           Mix_PlayChannel(LOSE_WAV, sound[LOSE_WAV], 0);
+
+        if (settings.tts){
+			stop_tts_announcer();
+			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Ohh game over!");
+		}
+			
 
         for (i = 0; i < OH_NO_FRAMES; i++)
           temp_text[i] = ohno[i];
