@@ -72,14 +72,15 @@ static void laser_unload_data(void);
 static void calc_city_pos(void);
 static void recalc_comet_pos(void);
 
+static int tts_announcer_exit = 0;
+
+
 //Still we are not going to use this 
 static void stop_tts_announcer()
 {
 	if (tts_announcer_thread)
     {
-		SDL_KillThread(tts_announcer_thread);
-        tts_announcer_thread = NULL;
-        T4K_Tts_stop();
+		tts_announcer_exit = 1;
     }	
 }
 
@@ -88,8 +89,12 @@ static int tts_announcer(void *unused)
 	int lowest,lowest_y,i,iter;
 	wchar_t buffer[3000];
 	int pitch_and_rate;
+	tts_announcer_exit = 0;
 	while(1)
 	{
+		if(tts_announcer_exit)
+			goto end;
+		
 		//Detecting the lowest letter and word on screen		
 		lowest_y = 0;
 		lowest = -1;	
@@ -139,6 +144,7 @@ static int tts_announcer(void *unused)
 		SDL_Delay(100);
 			
 	}
+	end:
 	return 1;
 }
 
