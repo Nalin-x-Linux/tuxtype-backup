@@ -748,7 +748,7 @@ int PlayCascade(int diflevel)
           xamp = WIN_GAME_XAMP;
           yamp = WIN_GAME_YAMP;
           if (settings.tts)
-			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Congratulations! Bye");          
+			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Congratulations! Bye!");          
         }
 
         for (i = 0; i < CONGRATS_FRAMES; i++)
@@ -765,12 +765,15 @@ int PlayCascade(int diflevel)
         xamp = 0;
         yamp = 0;
 
+        if (settings.tts)
+			stop_tts_announcer();        
+        
+
         if (settings.sys_sound)
           Mix_PlayChannel(LOSE_WAV, sound[LOSE_WAV], 0);
 
         if (settings.tts){
-			stop_tts_announcer();
-			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Ohh game over!");
+			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"yep you miss it. hahh hahh haa. game over! goodbye!");
 		}
 			
 
