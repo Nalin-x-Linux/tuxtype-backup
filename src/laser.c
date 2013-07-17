@@ -78,10 +78,7 @@ static int tts_announcer_exit = 0;
 //Still we are not going to use this 
 static void stop_tts_announcer()
 {
-	if (tts_announcer_thread)
-    {
-		tts_announcer_exit = 1;
-    }	
+	tts_announcer_exit = 1;
 }
 
 static int tts_announcer(void *unused)
@@ -135,8 +132,8 @@ static int tts_announcer(void *unused)
 		pitch_and_rate = ((lowest_y*100)/(screen->h - images[IMG_CITY_BLUE]->h));
 		if (pitch_and_rate < 30)
 			pitch_and_rate = 30;
-		if (pitch_and_rate > 70)
-			pitch_and_rate = 70;	
+		if (pitch_and_rate > 60)
+			pitch_and_rate = 60;	
 		T4K_Tts_say(pitch_and_rate,pitch_and_rate,INTERRUPT,"%S",buffer);
 		
 		//Wait to finish saying the previus word
@@ -631,7 +628,11 @@ int PlayLaserGame(int diff_level)
 		}
                 
                 if ((num_cities_alive==0) && (gameover == 0))
+                {
                     gameover = GAMEOVER_COUNTER_START;
+                    stop_tts_announcer();
+                    T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"yep you miss it. hahh hahh haa. game over! goodbye!");
+				}
       
 		/* Draw background: */
      
