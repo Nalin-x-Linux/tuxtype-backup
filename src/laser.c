@@ -577,7 +577,9 @@ int PlayLaserGame(int diff_level)
 				}
 			} else {
 				if (num_comets_alive == 0) {
-
+					if (settings.tts){
+						T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Score %d",score);
+					}
 					/* Time for the next wave! */
 
 					/* FIXME: End of level stuff goes here */
@@ -631,7 +633,7 @@ int PlayLaserGame(int diff_level)
                 {
                     gameover = GAMEOVER_COUNTER_START;
                     stop_tts_announcer();
-                    T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"yep you miss it. hahh hahh haa. game over! goodbye!");
+                    T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"yep you miss it. hahh hahh haa. game over! you scored %d goodbye!",score);
 				}
       
 		/* Draw background: */
