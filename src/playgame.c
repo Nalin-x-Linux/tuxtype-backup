@@ -108,18 +108,14 @@ static int tts_announcer(void *struct_address)
 	
 	while(1)
 	{
-		
-		
 		//Converting and taking the value of fishies from void address structure 
 		fishies = *struct_with_data_address.address_of_fishies;
-		fprintf(stderr,"\n%d",fishies);
 		
 		if(tts_announcer_exit)
 			goto end;
 		
 		
 		//Wait to finish saying the previus word	
-		
 		T4K_Tts_wait();
 		
 		
@@ -533,7 +529,7 @@ int PlayCascade(int diflevel)
 					//SDL_WaitThread(tts_thread,NULL);
 					//SDL_Delay(100);
 					stop_tts_announcer();
-					T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Game Paused.");
+					T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,gettext("Game Paused."));
 				}
                 
                 /* Pause() returns 1 if quitting, */
@@ -550,7 +546,7 @@ int PlayCascade(int diflevel)
 					{
 					   T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Pause Released!");
 					  //Call announcer function in thread which annonces the word to type
-					  tts_announcer_exit = 0;
+					  stop_tts_announcer();
 					  tts_announcer_thread = SDL_CreateThread(tts_announcer, &struct_with_data_address);
 					}
 					
@@ -744,7 +740,7 @@ int PlayCascade(int diflevel)
           xamp = WIN_GAME_XAMP;
           yamp = WIN_GAME_YAMP;
           if (settings.tts)
-			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Congratulations! Bye!");          
+			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Congratulations! Thank you! please wait till it return to main menu.");          
         }
 
         for (i = 0; i < CONGRATS_FRAMES; i++)
