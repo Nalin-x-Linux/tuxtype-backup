@@ -92,10 +92,7 @@ static int tts_announcer_exit = 0;
 
 static void stop_tts_announcer()
 {
-	if (tts_announcer_thread)
-    {
-		tts_announcer_exit = 1;
-    }	
+	tts_announcer_exit = 1;	
 }
 
 static int tts_announcer(void *struct_address)
@@ -115,6 +112,7 @@ static int tts_announcer(void *struct_address)
 		
 		//Converting and taking the value of fishies from void address structure 
 		fishies = *struct_with_data_address.address_of_fishies;
+		fprintf(stderr,"\n%d",fishies);
 		
 		if(tts_announcer_exit)
 			goto end;
@@ -189,8 +187,8 @@ static int tts_announcer(void *struct_address)
 				if (pitch_and_rate < 30)
 					pitch_and_rate = 30;
 				
-				if (pitch_and_rate > 90)
-					pitch_and_rate = 90;
+				if (pitch_and_rate > 60)
+					pitch_and_rate = 60;
 				
 				T4K_Tts_say(pitch_and_rate,pitch_and_rate,INTERRUPT,"%S",buffer);
 
@@ -261,8 +259,8 @@ static int tts_announcer(void *struct_address)
 				if (pitch_and_rate < 30)
 					pitch_and_rate = 30;
 				
-				if (pitch_and_rate > 70)
-					pitch_and_rate = 70;
+				if (pitch_and_rate > 60)
+					pitch_and_rate = 60;
 				 
 				
 				T4K_Tts_say(pitch_and_rate,pitch_and_rate,INTERRUPT,"%S",buffer);				
@@ -736,9 +734,7 @@ int PlayCascade(int diflevel)
           if (settings.tts)
           {
 			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Congratulation! Welcome to level %d!",curlevel+1);
-			tts_announcer_thread = SDL_CreateThread(tts_announcer, &struct_with_data_address);
-			}
-			
+			}		
         }
         else
         {
@@ -823,7 +819,13 @@ int PlayCascade(int diflevel)
 
         if (!settings.speed_up)
           WaitFrame();
+          
       }  /* End of animation for end of game */
+     if (still_playing && settings.tts)
+     {
+		fishies = 0;
+		tts_announcer_thread = SDL_CreateThread(tts_announcer, &struct_with_data_address);
+	 }
 
     }  /* End of post-level wrap-up  */
 
