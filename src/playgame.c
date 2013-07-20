@@ -105,6 +105,7 @@ static int tts_announcer(void *struct_address)
 	int pitch_and_rate;
 	int which,correct_position;
 	tts_announcer_exit = 0;
+	int max;
 	
 	while(1)
 	{
@@ -151,9 +152,14 @@ static int tts_announcer(void *struct_address)
 				}
 			}
 			
+			//We have to announce only last three otherwise it will make confusion.  
+			if (alive >= 3)
+				max = 2;
+			else
+				max = alive;
 
 			//Using this corrected order to say each words and letters
-			for(i=0;i<=alive;i++)
+			for(i=0;i<=max;i++)
 			{
 				if(tts_announcer_exit)
 					goto end;
