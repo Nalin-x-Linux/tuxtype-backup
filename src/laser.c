@@ -632,8 +632,10 @@ int PlayLaserGame(int diff_level)
                 if ((num_cities_alive==0) && (gameover == 0))
                 {
                     gameover = GAMEOVER_COUNTER_START;
-                    stop_tts_announcer();
-                    T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"yep you miss it. hahh hahh haa. game over! you scored %d goodbye!",score);
+                    if(settings.tts){
+						stop_tts_announcer();
+						T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"yep you miss it. hahh hahh haa. game over! you scored %d goodbye!",score);
+					}
 				}
       
 		/* Draw background: */
@@ -774,16 +776,16 @@ int PlayLaserGame(int diff_level)
 		/* If we're in "PAUSE" mode, pause! */
 
 		if (paused) {
-			SDL_KillThread(thread);
-			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Game Paused!");
+			if(settings.tts){
+				stop_tts_announcer();
+				T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Game Paused!");
+			}
 			quit = Pause();
-			if(settings.tts && settings.sys_sound && quit == 0)
-				{
+			if(settings.tts && settings.sys_sound && quit == 0){
 					T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Pause Released!");
-					SDL_Delay(700);
 					//Call announcer function in thread which annonces the word to type
 					thread = SDL_CreateThread(tts_announcer, NULL);
-				}							
+			}							
 			paused = 0;
 		}
 
