@@ -526,10 +526,8 @@ int PlayCascade(int diflevel)
               case SDLK_ESCAPE:
                 if(settings.tts && settings.sys_sound)
                 {
-					//SDL_WaitThread(tts_thread,NULL);
-					//SDL_Delay(100);
 					stop_tts_announcer();
-					T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,gettext("Game Paused."));
+					T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Game Paused.");
 				}
                 
                 /* Pause() returns 1 if quitting, */
@@ -546,7 +544,6 @@ int PlayCascade(int diflevel)
 					{
 					   T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Pause Released!");
 					  //Call announcer function in thread which annonces the word to type
-					  stop_tts_announcer();
 					  tts_announcer_thread = SDL_CreateThread(tts_announcer, &struct_with_data_address);
 					}
 					
@@ -819,7 +816,7 @@ int PlayCascade(int diflevel)
       }  /* End of animation for end of game */
      if (still_playing && settings.tts)
      {
-		fishies = 0;
+		fishies = 0; //Otherwise thread will announce old words and cause segfault
 		tts_announcer_thread = SDL_CreateThread(tts_announcer, &struct_with_data_address);
 	 }
 
