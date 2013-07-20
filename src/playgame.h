@@ -86,7 +86,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define HARD_SPEED_FACTOR       5
 
 #define FISH_SPACING_EASY    90
-#define FISH_SPACING_MEDIUM  40
+#define FISH_SPACING_MEDIUM  60
 #define FISH_SPACING_HARD    30
 
 #define LIVES_INIT_EASY      5
