@@ -88,6 +88,7 @@ static void UpdateTux(wchar_t letter_pressed, int fishies, int frame);
 static void WaitFrame(void);
 
 static int tts_announcer_exit = 0;
+int braille_letter_pos=0;
 
 
 static void stop_tts_announcer()
@@ -268,6 +269,7 @@ static int tts_announcer(void *struct_address)
 				T4K_Tts_say(pitch_and_rate,pitch_and_rate,INTERRUPT,"%S",buffer);				
 				SDL_WaitThread(tts_thread,NULL);
 				SDL_Delay(100);
+				fprintf(stderr,"\nBraille_Letter_Pos = %d",braille_letter_pos);
 			}
 			else
 			{
@@ -282,6 +284,51 @@ static int tts_announcer(void *struct_address)
 }
 
 
+/* Set the Braille letter position 
+ * This will be used to get exact letter with 
+ * Respect to pressed letters */ 
+static void set_braille_letter_pos(int fishies)
+{
+	int which,i,correct_position;
+
+    if (tux_object.wordlen == 0)
+    {
+		braille_letter_pos = 0;
+	}
+	else
+	{
+		//Detecting the corrent typing fish
+		which = -1;
+		for (i=0;i<fishies;i++)
+		{
+			//Comaparing fish_object[i].splat_time;
+			if (!fish_object[i].can_eat && fish_object[i].alive)
+			{
+				if (0 == wcsncmp(fish_object[i].word,tux_object.word,tux_object.wordlen))
+					which = i;		
+			}
+		}
+		//Detecting the correct_position if word is not null
+		if (which != -1){
+			correct_position = 0;
+			for(i=0;i<tux_object.wordlen;i++)
+			{
+				if (tux_object.word[i] == fish_object[which].word[i])
+				{
+					correct_position+=1;
+				}
+			}
+			//Braille letter Position should be 2 if next letter is end
+			if (tux_object.wordlen == fish_object[which].len-1)
+				braille_letter_pos = 2;
+			else
+				braille_letter_pos = 1;
+		}
+		else{
+			braille_letter_pos = 0;
+		}
+	}
+}
 /************************************************************************/
 /*                                                                      */ 
 /*         "Public" functions (callable throughout program)             */
@@ -328,6 +375,7 @@ int PlayCascade(int diflevel)
   //Braille Variables
   wchar_t pressed_letters[1000];
   int braille_iter;
+
 
 
   //Structure which contain the address of above struct 
@@ -533,7 +581,7 @@ int PlayCascade(int diflevel)
                 if(settings.tts && settings.sys_sound)
                 {
 					stop_tts_announcer();
-					T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Game Paused.");
+					T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,gettext("Game Paused."));
 				}
                 
                 /* Pause() returns 1 if quitting, */
@@ -548,7 +596,7 @@ int PlayCascade(int diflevel)
                 {
 					if(settings.tts && settings.sys_sound)
 					{
-					   T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Pause Released!");
+					   T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,gettext("Pause Released!"));
 					  //Call announcer function in thread which annonces the word to type
 					  tts_announcer_thread = SDL_CreateThread(tts_announcer, &struct_with_data_address);
 					}
@@ -619,7 +667,12 @@ int PlayCascade(int diflevel)
 					   {
 						   if (wcscmp(pressed_letters,braille_key_value_map[i].key) == 0)
 						   {
-							   UpdateTux(toupper(braille_key_value_map[i].value[0]), fishies, frame);			   
+							   if (braille_letter_pos == 0)
+									UpdateTux(toupper(braille_key_value_map[i].value_begin[0]), fishies, frame);
+							   else if (braille_letter_pos == 1)
+									UpdateTux(toupper(braille_key_value_map[i].value_middle[0]), fishies, frame);
+							   else
+									UpdateTux(toupper(braille_key_value_map[i].value_end[0]), fishies, frame);																					   
 						   }
 					   }	   
 				   }
@@ -825,9 +878,9 @@ int PlayCascade(int diflevel)
 		fishies = 0; //Otherwise thread will announce old words and cause segfault
 		tts_announcer_thread = SDL_CreateThread(tts_announcer, &struct_with_data_address);
 	 }
-
+	
     }  /* End of post-level wrap-up  */
-
+  
   }  /*   -------- End outer game loop -------------- */
   
 
@@ -871,7 +924,7 @@ static int check_word( int f ) {
 		return 0;
 
 	for (i=0; i < wcslen(fish_object[f].word); i++) 
-		if (fish_object[f].word[i] != tux_object.word[tux_object.wordlen -                                           wcslen(fish_object[f].word) + i])
+		if (fish_object[f].word[i] != tux_object.word[tux_object.wordlen -  wcslen(fish_object[f].word) + i])
 			return 0;
 
 	return 1;
@@ -1697,6 +1750,7 @@ void UpdateTux(wchar_t letter_pressed, int fishies, int frame) {
 		tux_object.wordlen = 0;
 		tux_object.word[0] = 0;
 	}
+	set_braille_letter_pos(fishies);
 
 }
 
