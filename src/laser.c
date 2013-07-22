@@ -73,7 +73,7 @@ static void calc_city_pos(void);
 static void recalc_comet_pos(void);
 
 static int tts_announcer_exit = 0;
-
+static int braille_letter_pos = 0;
 
 //Still we are not going to use this 
 static void stop_tts_announcer()
@@ -139,6 +139,7 @@ static int tts_announcer(void *unused)
 		//Wait to finish saying the previus word
 		SDL_WaitThread(tts_thread,NULL);
 		SDL_Delay(100);
+		fprintf(stderr,"\nPos = %d",braille_letter_pos);
 			
 	}
 	end:
@@ -340,10 +341,19 @@ int PlayLaserGame(int diff_level)
 						   if (wcscmp(pressed_letters,braille_key_value_map[i].key) == 0)
 						   {
 							   if (settings.use_english)
+							   {
+								   /* English have no such rules */
 							   	   ans[ans_num++] = toupper(braille_key_value_map[i].value_begin[0]);
+							   }
 							   else
-									ans[ans_num++] = braille_key_value_map[i].value_begin[0];
-							   //fprintf(stderr,"\n%c",braille_key_value_map[i].value[0]);			   
+							   {
+							   		if (braille_letter_pos == 0)
+								   	   ans[ans_num++] = braille_key_value_map[i].value_begin[0];
+								    else if (braille_letter_pos == 1)
+									   ans[ans_num++] = braille_key_value_map[i].value_middle[0];
+								    else
+									   ans[ans_num++] = braille_key_value_map[i].value_end[0];
+							   }			   
 						   }
 					   }	   
 				   }
@@ -365,8 +375,8 @@ int PlayLaserGame(int diff_level)
 			lowest_y = 0;
 			lowest = -1;
 			
-			//Only Shoot the lowest letter if tts is enabled.
-			if (settings.tts)
+			/* Only Shoot the lowest letter if tts is enabled. */
+			if (settings.tts || settings.braille)
 			{
 				for (i = 0; i < MAX_COMETS; i++)
 					if (comets[i].alive
@@ -395,6 +405,21 @@ int PlayLaserGame(int diff_level)
 						lowest_y = comets[i].y;
 					}	
 			}
+			
+			if (lowest == -1)
+				braille_letter_pos = 0;
+			else
+			{
+				if (comets[lowest].pos == wcslen(comets[lowest].word)-2)
+					braille_letter_pos = 2; //Next is end letter
+				else if (comets[lowest].pos == wcslen(comets[lowest].word)-1)
+					braille_letter_pos = 0; //Word finished 
+				else
+					braille_letter_pos = 1; //Next letter is at middle
+					
+				fprintf(stderr,"%S",comets[lowest].word);
+			}
+				
 	
 			/* If there was an comet with this answer, destroy it! */
 			if (lowest != -1) {
