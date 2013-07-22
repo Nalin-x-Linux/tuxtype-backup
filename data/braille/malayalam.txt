@@ -15,7 +15,7 @@ dsjl ധ ധ ധ
 fsjk ന ന ന
 fdsj പ പ പ
 dsk ഫ ഫ !
-fkj മ മ മ
+fsj മ മ മ
 dsjkl ട ട ട
 djkl ഠ ഠ ഠ
 fdjl ഡ ഡ ഡ
@@ -39,13 +39,14 @@ sk ഈ ീ ീ
 fsl ഉ ു ു
 fdkl ഊ ൂ ൂ
 fdj ഋ ൃ ൃ
-dl ഏ െ െ
+dl എ െ െ
 fk ഏ േ േ
 sj ഐ ൈ ൈ
 fsjl ഒ ൊ ൊ
 fsk ഓ ോ ോ
 djl ഔ ൗ ൗ
 kl ം ം ം
+j ് ് ്
 d , , ,
 ds ; ; ;
 dkl . . .
