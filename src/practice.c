@@ -152,7 +152,7 @@ int Phrases(wchar_t* pphrase )
 
 	//Moved by N.x.L
 	int key;
-	char tmp;
+	wchar_t tmp;
 	int shift_pressed;
 	int check_key;
 
