@@ -41,7 +41,7 @@ int braille_language_loader(char* language)
 			
 	while(!feof(fp))
 	{
-		fscanf(fp,"%S %S\n",braille_key_value_map[iter].key,braille_key_value_map[iter].value);
+		fscanf(fp,"%S %S %S %S\n",braille_key_value_map[iter].key,braille_key_value_map[iter].value_begin,braille_key_value_map[iter].value_middle,braille_key_value_map[iter].value_end);
 		iter++;
 	}
 	return 1;
