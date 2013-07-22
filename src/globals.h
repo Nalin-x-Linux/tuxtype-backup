@@ -124,7 +124,9 @@ typedef struct game_option_type{
 struct braille_dict
 {
 	wchar_t key[100];
-	wchar_t value[100];
+	wchar_t value_begin[100];
+	wchar_t value_middle[100];
+	wchar_t value_end[100];
 }braille_key_value_map[100];
 
 
