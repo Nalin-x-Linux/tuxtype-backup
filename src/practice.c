@@ -147,7 +147,8 @@ int Phrases(wchar_t* pphrase )
   //Braille Variables
   wchar_t pressed_letters[1000];
   int braille_iter;
-  int braille_capital;
+  int braille_capital = 0;
+  int braille_letter_pos = 0;
 
 	//Moved by N.x.L
 	int key;
@@ -681,7 +682,13 @@ int Phrases(wchar_t* pphrase )
 						{
 							if (wcscmp(pressed_letters,braille_key_value_map[i].key) == 0)
 							{
-								tmp = braille_key_value_map[i].value[0];
+								if (braille_letter_pos == 0)
+									tmp = braille_key_value_map[i].value_begin[0];
+								else if (braille_letter_pos == 1)
+									tmp = braille_key_value_map[i].value_middle[0];
+								else
+									tmp = braille_key_value_map[i].value_end[0];
+								
 								check_key = 1;
 								if (braille_capital)
 									{
@@ -788,9 +795,20 @@ int Phrases(wchar_t* pphrase )
 		   else
 		   {
 			  //Next letter is not Space
-			  T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%c",phrases[cur_phrase][cursor]);			  
+			  T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%C",phrases[cur_phrase][cursor]);			  
 		   }
-		  
+
+		   /* Setting the letter pos for braille */
+		   if (phrases[cur_phrase][cursor-1] == ' '){
+				braille_letter_pos = 0;
+		   }
+		   else{
+			   if (phrases[cur_phrase][cursor+1] == ' ')
+					braille_letter_pos = 2;
+			   else
+					braille_letter_pos = 1;
+			}
+			fprintf(stderr,"\nPosition = %d",braille_letter_pos);		  
 		  
 		  
 
@@ -967,7 +985,7 @@ int Phrases(wchar_t* pphrase )
 				  if (phrases[cur_phrase][cursor] == ' ')
 					T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Type Space",phrases[cur_phrase][cursor]);
 				  else
-					T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Type %c",phrases[cur_phrase][cursor]);
+					T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Type %C",phrases[cur_phrase][cursor]);
 			   }
             }
           }
