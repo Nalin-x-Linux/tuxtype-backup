@@ -1,30 +1,10 @@
 ## Makefile.am for tuxtype - braille/im:
 ## Process with Automake to create Makefile.in
 brailledir = $(pkgdatadir)/braille
-dist_braille_DATA = abbreviations.txt	\
-english_five_six.txt	\
-english_five.txt	\
-english_four_five_six.txt	\
-english_four_five.txt	\
-english_four_six.txt	\
-english_four.txt	\
-english_middle.txt	\
-english_six.txt		\
-english.txt		\
-hindi_middle.txt	\
-hindi_three_six.txt	\
-hindi.txt		\
-malayalam_five.txt			\
-malayalam_middle.txt			\
-malayalam_one_five_six.txt		\
-malayalam_one_three_five_six.txt	\
-malayalam_six.txt			\
-malayalam_three_six.txt			\
-malayalam_three.txt			\
+dist_braille_DATA = english.txt		\
+hindi.txt				\
 malayalam.txt				\
 numerical.txt				\
 punctuations.txt			\
-spanish_middle.txt			\
 spanish.txt				\
-tamil_middle.txt			\
 tamil.txt 				
