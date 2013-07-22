@@ -339,7 +339,10 @@ int PlayLaserGame(int diff_level)
 					   {
 						   if (wcscmp(pressed_letters,braille_key_value_map[i].key) == 0)
 						   {
-							   ans[ans_num++] = toupper(braille_key_value_map[i].value[0]);
+							   if (settings.use_english)
+							   	   ans[ans_num++] = toupper(braille_key_value_map[i].value_begin[0]);
+							   else
+									ans[ans_num++] = braille_key_value_map[i].value_begin[0];
 							   //fprintf(stderr,"\n%c",braille_key_value_map[i].value[0]);			   
 						   }
 					   }	   
