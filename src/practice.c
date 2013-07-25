@@ -909,9 +909,9 @@ int Phrases(wchar_t* pphrase )
           {
 			  //        time_str,chars_typed_str,cpm_str,wpm_str,errors_str,accuracy_str	
 			  
-			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Wow. you completed sentence with %s characters in \
+			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,gettext("Wow. you completed sentence with %s characters in \
 															%s time, your speed is %s word per minut and \
-															percentage of accuracy is %s",chars_typed_str,time_str,
+															percentage of accuracy is %s"),chars_typed_str,time_str,
 															wpm_str,accuracy_str);
             /* Draw Tux celebrating: */
             {
