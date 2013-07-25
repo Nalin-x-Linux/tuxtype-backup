@@ -785,7 +785,7 @@ int PlayCascade(int diflevel)
           won_level = 0;
           if (settings.tts)
           {
-			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Congratulation! Welcome to level %d!",curlevel+1);
+			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,gettext("Congratulation! Welcome to level %d!"),curlevel+1);
 			}		
         }
         else
@@ -796,7 +796,7 @@ int PlayCascade(int diflevel)
           xamp = WIN_GAME_XAMP;
           yamp = WIN_GAME_YAMP;
           if (settings.tts)
-			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Congratulations! Thank you! please wait till it return to main menu.");          
+			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,gettext("Congratulations! Thank you! please wait till it return to main menu."));          
         }
 
         for (i = 0; i < CONGRATS_FRAMES; i++)
@@ -821,7 +821,7 @@ int PlayCascade(int diflevel)
           Mix_PlayChannel(LOSE_WAV, sound[LOSE_WAV], 0);
 
         if (settings.tts){
-			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"yep you miss it. hahh hahh haa. game over! goodbye!");
+			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,gettext("yep you miss it. hahh hahh haa. game over! goodbye!"));
 		}
 			
 
