@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tuxtype 1.8.1\n"
 "Report-Msgid-Bugs-To: tux4kids-tuxtype-dev@lists.alioth.debian.org\n"
-"POT-Creation-Date: 2012-02-02 20:16-0600\n"
+"POT-Creation-Date: 2013-07-27 08:12+0530\n"
 "PO-Revision-Date: 2011-01-02 13:37+0530\n"
 "Last-Translator: Atharva <atharva_96@live.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,7 +15,27 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/loaders.c:98 src/main.c:161 src/playgame.c:654
+#: src/laser.c:609
+#, c-format
+msgid "Score %d"
+msgstr ""
+
+#: src/laser.c:665
+#, c-format
+msgid "yep you miss it. hahh hahh haa. game over! you scored %d goodbye!"
+msgstr ""
+
+#: src/laser.c:809
+#, fuzzy
+msgid "Game Paused!"
+msgstr "रुका हुआ है!"
+
+#: src/laser.c:813 src/playgame.c:599
+#, fuzzy
+msgid "Pause Released!"
+msgstr "रुका हुआ है!"
+
+#: src/loaders.c:99 src/main.c:179 src/playgame.c:1009
 msgid "Fish"
 msgstr "मछली"
 
@@ -43,63 +63,89 @@ msgstr "प्रेस इसकेप फिर मेनू पर लौट�
 msgid "Press space bar to return to game"
 msgstr "प्रेस स्पेसबार खेल पर लौटने के लिए"
 
-#: src/playgame.c:652
+#: src/playgame.c:584
+#, fuzzy
+msgid "Game Paused."
+msgstr "रुका हुआ है!"
+
+#: src/playgame.c:788
+#, c-format
+msgid "Congratulation! Welcome to level %d!"
+msgstr ""
+
+#: src/playgame.c:799
+msgid "Congratulations! Thank you! please wait till it return to main menu."
+msgstr ""
+
+#: src/playgame.c:824
+msgid "yep you miss it. hahh hahh haa. game over! goodbye!"
+msgstr ""
+
+#: src/playgame.c:1007
 msgid "Level"
 msgstr "स्तर"
 
-#: src/playgame.c:653
+#: src/playgame.c:1008
 msgid "Lives"
 msgstr "जीवन"
 
-#: src/playgame.c:656 src/titlescreen.c:99
+#: src/playgame.c:1011 src/titlescreen.c:99
 msgid "Easy"
 msgstr "आसान"
 
-#: src/playgame.c:657 src/titlescreen.c:100
+#: src/playgame.c:1012 src/titlescreen.c:100
 msgid "Medium"
 msgstr "मीडियम"
 
-#: src/playgame.c:658 src/titlescreen.c:101
+#: src/playgame.c:1013 src/titlescreen.c:101
 msgid "Hard"
 msgstr "कठिन"
 
-#: src/playgame.c:659
+#: src/playgame.c:1014
 msgid "Practice"
 msgstr "अभ्यास"
 
-#: src/playgame.c:670
+#: src/playgame.c:1025
 msgid "Congratulations"
 msgstr "बधाई हो"
 
-#: src/playgame.c:674
+#: src/playgame.c:1029
 msgid "Oh No!"
 msgstr "अरे नहीं!"
 
-#: src/practice.c:626
+#: src/practice.c:744
 msgid "sec"
 msgstr "सेकंड"
 
-#: src/practice.c:1440
+#: src/practice.c:912
+#, c-format
+msgid ""
+"Wow. you completed sentence with %s characters in \t\t\t\t\t\t\t\t\t\t\t\t\t"
+"\t\t%s time, your speed is %s word per minut and \t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+"\tpercentage of accuracy is %s"
+msgstr ""
+
+#: src/practice.c:1621
 msgid "Time"
 msgstr "समय"
 
-#: src/practice.c:1444
+#: src/practice.c:1625
 msgid "Chars"
 msgstr "घर का काम"
 
-#: src/practice.c:1448
+#: src/practice.c:1629
 msgid "CPM"
 msgstr "CPM"
 
-#: src/practice.c:1452
+#: src/practice.c:1633
 msgid "WPM"
 msgstr "WPM"
 
-#: src/practice.c:1456
+#: src/practice.c:1637
 msgid "Errors"
 msgstr "त्रुटियों"
 
-#: src/practice.c:1460
+#: src/practice.c:1641
 msgid "Accuracy"
 msgstr "शुद्धता"
 
@@ -163,14 +209,14 @@ msgstr "छोड़ना"
 msgid "Main Menu"
 msgstr "मुख्य मेनू"
 
-#: src/titlescreen.c:1129
+#: src/titlescreen.c:1130
 msgid "Work In Progress!"
 msgstr "कार्य प्रगति पर!"
 
-#: src/titlescreen.c:1130
+#: src/titlescreen.c:1131
 msgid "This feature is not ready yet"
 msgstr "यह सुविधा अभी तक तैयार नहीं है"
 
-#: src/titlescreen.c:1131
+#: src/titlescreen.c:1132
 msgid "Discuss the future of TuxTyping at"
 msgstr "TuxTyping का भविष्य चर्चा में "

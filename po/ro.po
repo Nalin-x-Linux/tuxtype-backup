@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tuxtype\n"
 "Report-Msgid-Bugs-To: tux4kids-tuxtype-dev@lists.alioth.debian.org\n"
-"POT-Creation-Date: 2012-02-02 20:16-0600\n"
+"POT-Creation-Date: 2013-07-27 08:12+0530\n"
 "PO-Revision-Date: 2010-11-24 18:33+0300\n"
 "Last-Translator: crengu <crengutamirela@hotmail.com>\n"
 "Language-Team: cool\n"
@@ -14,7 +14,27 @@ msgstr ""
 "20)) ? 1 : 2);;\n"
 "X-Generator: Virtaal 0.6.1\n"
 
-#: src/loaders.c:98 src/main.c:161 src/playgame.c:654
+#: src/laser.c:609
+#, c-format
+msgid "Score %d"
+msgstr ""
+
+#: src/laser.c:665
+#, c-format
+msgid "yep you miss it. hahh hahh haa. game over! you scored %d goodbye!"
+msgstr ""
+
+#: src/laser.c:809
+#, fuzzy
+msgid "Game Paused!"
+msgstr "Pauză!"
+
+#: src/laser.c:813 src/playgame.c:599
+#, fuzzy
+msgid "Pause Released!"
+msgstr "Pauză!"
+
+#: src/loaders.c:99 src/main.c:179 src/playgame.c:1009
 msgid "Fish"
 msgstr "Peste"
 
@@ -42,63 +62,89 @@ msgstr "Apăsati escape din nou pentru a reveni la meniu"
 msgid "Press space bar to return to game"
 msgstr "Apăsati pe bara de spaţiu pentru a reveni la joc"
 
-#: src/playgame.c:652
+#: src/playgame.c:584
+#, fuzzy
+msgid "Game Paused."
+msgstr "Pauză!"
+
+#: src/playgame.c:788
+#, c-format
+msgid "Congratulation! Welcome to level %d!"
+msgstr ""
+
+#: src/playgame.c:799
+msgid "Congratulations! Thank you! please wait till it return to main menu."
+msgstr ""
+
+#: src/playgame.c:824
+msgid "yep you miss it. hahh hahh haa. game over! goodbye!"
+msgstr ""
+
+#: src/playgame.c:1007
 msgid "Level"
 msgstr "Nivel"
 
-#: src/playgame.c:653
+#: src/playgame.c:1008
 msgid "Lives"
 msgstr "Vieti"
 
-#: src/playgame.c:656 src/titlescreen.c:99
+#: src/playgame.c:1011 src/titlescreen.c:99
 msgid "Easy"
 msgstr "Usor"
 
-#: src/playgame.c:657 src/titlescreen.c:100
+#: src/playgame.c:1012 src/titlescreen.c:100
 msgid "Medium"
 msgstr "Medium"
 
-#: src/playgame.c:658 src/titlescreen.c:101
+#: src/playgame.c:1013 src/titlescreen.c:101
 msgid "Hard"
 msgstr "Greu"
 
-#: src/playgame.c:659
+#: src/playgame.c:1014
 msgid "Practice"
 msgstr "Practică"
 
-#: src/playgame.c:670
+#: src/playgame.c:1025
 msgid "Congratulations"
 msgstr "Felicitări"
 
-#: src/playgame.c:674
+#: src/playgame.c:1029
 msgid "Oh No!"
 msgstr "O Nu!"
 
-#: src/practice.c:626
+#: src/practice.c:744
 msgid "sec"
 msgstr ""
 
-#: src/practice.c:1440
+#: src/practice.c:912
+#, c-format
+msgid ""
+"Wow. you completed sentence with %s characters in \t\t\t\t\t\t\t\t\t\t\t\t\t"
+"\t\t%s time, your speed is %s word per minut and \t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+"\tpercentage of accuracy is %s"
+msgstr ""
+
+#: src/practice.c:1621
 msgid "Time"
 msgstr "Timp"
 
-#: src/practice.c:1444
+#: src/practice.c:1625
 msgid "Chars"
 msgstr "Caractere"
 
-#: src/practice.c:1448
+#: src/practice.c:1629
 msgid "CPM"
 msgstr "CPM"
 
-#: src/practice.c:1452
+#: src/practice.c:1633
 msgid "WPM"
 msgstr "WPM"
 
-#: src/practice.c:1456
+#: src/practice.c:1637
 msgid "Errors"
 msgstr "Erori"
 
-#: src/practice.c:1460
+#: src/practice.c:1641
 msgid "Accuracy"
 msgstr "Acuratete"
 
@@ -162,14 +208,14 @@ msgstr "Iesi"
 msgid "Main Menu"
 msgstr "Meniul principal"
 
-#: src/titlescreen.c:1129
+#: src/titlescreen.c:1130
 msgid "Work In Progress!"
 msgstr "Lucrări în curs!"
 
-#: src/titlescreen.c:1130
+#: src/titlescreen.c:1131
 msgid "This feature is not ready yet"
 msgstr "Această caracteristică nu este gata încă"
 
-#: src/titlescreen.c:1131
+#: src/titlescreen.c:1132
 msgid "Discuss the future of TuxTyping at"
 msgstr "Vorbeste despre viitorul lui TuxTyping la"

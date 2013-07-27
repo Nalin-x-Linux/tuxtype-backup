@@ -1,6 +1,6 @@
 # English translations for tuxtype package.
 # This file is put in the public domain.
-# Automatically generated, 2012.
+# Automatically generated, 2013.
 #
 # All this catalog "translates" are quotation characters.
 # The msgids must be ASCII and therefore cannot contain real quotation
@@ -31,8 +31,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tuxtype 1.8.3\n"
 "Report-Msgid-Bugs-To: tux4kids-tuxtype-dev@lists.alioth.debian.org\n"
-"POT-Creation-Date: 2012-02-02 20:16-0600\n"
-"PO-Revision-Date: 2012-02-02 20:16-0600\n"
+"POT-Creation-Date: 2013-07-27 08:12+0530\n"
+"PO-Revision-Date: 2013-07-27 08:12+0530\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en@boldquot\n"
@@ -41,7 +41,25 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/loaders.c:98 src/main.c:161 src/playgame.c:654
+#: src/laser.c:609
+#, c-format
+msgid "Score %d"
+msgstr "Score %d"
+
+#: src/laser.c:665
+#, c-format
+msgid "yep you miss it. hahh hahh haa. game over! you scored %d goodbye!"
+msgstr "yep you miss it. hahh hahh haa. game over! you scored %d goodbye!"
+
+#: src/laser.c:809
+msgid "Game Paused!"
+msgstr "Game Paused!"
+
+#: src/laser.c:813 src/playgame.c:599
+msgid "Pause Released!"
+msgstr "Pause Released!"
+
+#: src/loaders.c:99 src/main.c:179 src/playgame.c:1009
 msgid "Fish"
 msgstr "Fish"
 
@@ -69,63 +87,91 @@ msgstr "Press escape again to return to menu"
 msgid "Press space bar to return to game"
 msgstr "Press space bar to return to game"
 
-#: src/playgame.c:652
+#: src/playgame.c:584
+msgid "Game Paused."
+msgstr "Game Paused."
+
+#: src/playgame.c:788
+#, c-format
+msgid "Congratulation! Welcome to level %d!"
+msgstr "Congratulation! Welcome to level %d!"
+
+#: src/playgame.c:799
+msgid "Congratulations! Thank you! please wait till it return to main menu."
+msgstr "Congratulations! Thank you! please wait till it return to main menu."
+
+#: src/playgame.c:824
+msgid "yep you miss it. hahh hahh haa. game over! goodbye!"
+msgstr "yep you miss it. hahh hahh haa. game over! goodbye!"
+
+#: src/playgame.c:1007
 msgid "Level"
 msgstr "Level"
 
-#: src/playgame.c:653
+#: src/playgame.c:1008
 msgid "Lives"
 msgstr "Lives"
 
-#: src/playgame.c:656 src/titlescreen.c:99
+#: src/playgame.c:1011 src/titlescreen.c:99
 msgid "Easy"
 msgstr "Easy"
 
-#: src/playgame.c:657 src/titlescreen.c:100
+#: src/playgame.c:1012 src/titlescreen.c:100
 msgid "Medium"
 msgstr "Medium"
 
-#: src/playgame.c:658 src/titlescreen.c:101
+#: src/playgame.c:1013 src/titlescreen.c:101
 msgid "Hard"
 msgstr "Hard"
 
-#: src/playgame.c:659
+#: src/playgame.c:1014
 msgid "Practice"
 msgstr "Practice"
 
-#: src/playgame.c:670
+#: src/playgame.c:1025
 msgid "Congratulations"
 msgstr "Congratulations"
 
-#: src/playgame.c:674
+#: src/playgame.c:1029
 msgid "Oh No!"
 msgstr "Oh No!"
 
-#: src/practice.c:626
+#: src/practice.c:744
 msgid "sec"
 msgstr "sec"
 
-#: src/practice.c:1440
+#: src/practice.c:912
+#, c-format
+msgid ""
+"Wow. you completed sentence with %s characters in \t\t\t\t\t\t\t\t\t\t\t\t\t"
+"\t\t%s time, your speed is %s word per minut and \t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+"\tpercentage of accuracy is %s"
+msgstr ""
+"Wow. you completed sentence with %s characters in \t\t\t\t\t\t\t\t\t\t\t\t\t"
+"\t\t%s time, your speed is %s word per minut and \t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+"\tpercentage of accuracy is %s"
+
+#: src/practice.c:1621
 msgid "Time"
 msgstr "Time"
 
-#: src/practice.c:1444
+#: src/practice.c:1625
 msgid "Chars"
 msgstr "Chars"
 
-#: src/practice.c:1448
+#: src/practice.c:1629
 msgid "CPM"
 msgstr "CPM"
 
-#: src/practice.c:1452
+#: src/practice.c:1633
 msgid "WPM"
 msgstr "WPM"
 
-#: src/practice.c:1456
+#: src/practice.c:1637
 msgid "Errors"
 msgstr "Errors"
 
-#: src/practice.c:1460
+#: src/practice.c:1641
 msgid "Accuracy"
 msgstr "Accuracy"
 
@@ -189,14 +235,14 @@ msgstr "Quit"
 msgid "Main Menu"
 msgstr "Main Menu"
 
-#: src/titlescreen.c:1129
+#: src/titlescreen.c:1130
 msgid "Work In Progress!"
 msgstr "Work In Progress!"
 
-#: src/titlescreen.c:1130
+#: src/titlescreen.c:1131
 msgid "This feature is not ready yet"
 msgstr "This feature is not ready yet"
 
-#: src/titlescreen.c:1131
+#: src/titlescreen.c:1132
 msgid "Discuss the future of TuxTyping at"
 msgstr "Discuss the future of TuxTyping at"
