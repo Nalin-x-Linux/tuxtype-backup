@@ -209,18 +209,20 @@ int Phrases(wchar_t* pphrase )
         correct_chars = 0;
         wrong_chars = 0;
         
+        /* Announce the entire line at the beginning */ 
         if (settings.tts && settings.sys_sound && settings.menu_sound)
         {
 			if (pphrase == NULL){
+				/* For phrase typing */
 				T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",phrases[cur_phrase]);
 			 }
 			else 
 			{
-				//For Lesson's
+				/* For Lesson's announce only current word */
 				len = wcslen(phrases[cur_phrase]);
 				for(iter=0,i=cursor;i<len;i++)
 				{
-					//Break if a space found
+					//Break when a space found
 					if(phrases[cur_phrase][i] == ' ')
 						break;
 					tts_temp[iter] = phrases[cur_phrase][i];iter++;	
@@ -650,6 +652,7 @@ int Phrases(wchar_t* pphrase )
           default: break;
         }
         
+        /* Store each keys till a key released */
         if(settings.braille)
 		{
 		   pressed_letters[braille_iter] = event.key.keysym.sym;
@@ -764,7 +767,6 @@ int Phrases(wchar_t* pphrase )
           
           
           /* --------- Announcing the next letter to Type --------------------------*/
-          //Data for TTS
           tts_temp[0] = '\0';
 		  if (phrases[cur_phrase][cursor] == ' ')
 		  {
@@ -790,15 +792,19 @@ int Phrases(wchar_t* pphrase )
 					}
 			  }
 			  tts_temp[iter] = '\0';
-			  T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Space %S",tts_temp);			  			  
+			  if (settings.tts)
+					T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Space %S",tts_temp);			  			  
 		   }
 		   else
 		   {
 			  //Next letter is not Space
-			  T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%C",phrases[cur_phrase][cursor]);			  
+			  if (settings.tts)
+				T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%C",phrases[cur_phrase][cursor]);			  
 		   }
 
-		   /* Setting the letter pos for braille */
+		   /* Setting the letter pos for braille acording to next letter to be typed 
+		    * For some specific language's which have same braille code for
+		    * alphabets and signs at begining, middle and end position.*/
 		   if (phrases[cur_phrase][cursor-1] == ' '){
 				braille_letter_pos = 0;
 		   }
@@ -808,7 +814,6 @@ int Phrases(wchar_t* pphrase )
 			   else
 					braille_letter_pos = 1;
 			}
-			fprintf(stderr,"\nPosition = %d",braille_letter_pos);		  
 		  
 		  
 
@@ -907,12 +912,15 @@ int Phrases(wchar_t* pphrase )
           /* If player has completed phrase, celebrate! */
           if (cursor == wcslen(phrases[cur_phrase]))
           {
-			  //        time_str,chars_typed_str,cpm_str,wpm_str,errors_str,accuracy_str	
-			  
-			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,gettext("Wow. you completed sentence with %s characters in \
-															%s time, your speed is %s word per minut and \
-															percentage of accuracy is %s"),chars_typed_str,time_str,
-															wpm_str,accuracy_str);
+			/* Annoncing the result */ 
+			if (settings.tts)
+			{
+				T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,
+			       gettext("Wow. you completed sentence with %s characters in \
+			       %s time, your speed is %s word per minut and \
+			       percentage of accuracy is %s"),chars_typed_str,time_str,
+			       wpm_str,accuracy_str);
+			}
             /* Draw Tux celebrating: */
             {
               int done = 0;
@@ -980,6 +988,8 @@ int Phrases(wchar_t* pphrase )
             {
               wrong_chars++;
               PlaySound(wrong);
+              
+              /* Announce the letter again when incorrect letter. */
               if (settings.tts && settings.sys_sound && settings.menu_sound)
               {
 				  if (phrases[cur_phrase][cursor] == ' ')

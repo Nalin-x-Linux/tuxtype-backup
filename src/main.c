@@ -195,9 +195,10 @@ int main(int argc, char *argv[])
     Mix_Volume(-1, settings.sfx_volume);
   }
   
+  
+  /* Initialising TTS */
   if (settings.tts)
   {
-	  //Initialising TTS
 	  T4K_Tts_init();
 	  T4K_Tts_set_volume(settings.tts_volume);
   }

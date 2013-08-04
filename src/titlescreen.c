@@ -732,7 +732,10 @@ void TitleScreen(void)
       SDL_UpdateRect(screen, 0, 0, 0, 0);
 
       LOG("TitleScreen() - update_locs completed\n");
-	  T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",gettext(menu_text[key_menu*5 + menu_depth]));
+      
+      /* --- Announce the selected menu item */
+      if (settings.tts)
+      	  T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",gettext(menu_text[key_menu*5 + menu_depth]));
     }
 
 
@@ -801,7 +804,10 @@ void TitleScreen(void)
       {
         REWIND(menu_gfx[key_menu][menu_depth]);
         PlaySound(snd_move);
-		T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",gettext(menu_text[key_menu*5 + menu_depth]));
+        
+        /* --- Announce the selected menu item */
+		if (settings.tts)
+			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",gettext(menu_text[key_menu*5 + menu_depth]));
       }
 
       SDL_BlitSurface(CurrentBkgd(), &menu_button[key_menu], screen, &menu_button[key_menu]);
@@ -1578,8 +1584,10 @@ static int chooseWordlist(void)
         {
 			/* Draw selected text in yellow:  */
           SDL_BlitSurface(select[loc], NULL, screen, &titleRects[i%8]);
-          T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",wordlistName[loc]);
-
+          
+          /* --- Announce the selected word list */
+          if (settings.tts)
+				T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",wordlistName[loc]);
         }  
         else
         {

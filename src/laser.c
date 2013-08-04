@@ -58,6 +58,9 @@ static comet_type comets[MAX_COMETS];
 static city_type cities[NUM_CITIES];
 static laser_type laser;
 
+static int tts_announcer_exit = 0;
+static int braille_letter_pos = 0;
+
 /* Local function prototypes: */
 static void laser_add_comet(int diff_level);
 static void laser_add_score(int inc);
@@ -71,85 +74,8 @@ static void laser_putpixel(SDL_Surface* surface, int x, int y, Uint32 pixel);
 static void laser_unload_data(void);
 static void calc_city_pos(void);
 static void recalc_comet_pos(void);
-
-static int tts_announcer_exit = 0;
-static int braille_letter_pos = 0;
-
-//Still we are not going to use this 
-static void stop_tts_announcer()
-{
-	tts_announcer_exit = 1;
-}
-
-static int tts_announcer(void *unused)
-{
-	int lowest,lowest_y,i,iter;
-	wchar_t buffer[3000];
-	int pitch_and_rate;
-	tts_announcer_exit = 0;
-	while(1)
-	{
-		if(tts_announcer_exit)
-			goto end;
-		
-		//Detecting the lowest letter and word on screen		
-		lowest_y = 0;
-		lowest = -1;	
-		for (i = 0; i < MAX_COMETS; i++)
-		{
-			if (comets[i].alive  &&
-			 comets[i].shootable  &&
-			  comets[i].expl == 0  &&
-			   comets[i].y > lowest_y)
-			{
-				lowest = i;
-				lowest_y = comets[i].y;
-			}
-		}
-		//Skipping if no letter found in screen
-		if (lowest == -1)
-			continue;
-		
-		buffer[0] = L'\0';
-		//Adding the word to buffer
-		wcscpy(buffer,comets[lowest].word);
-		iter = wcslen(comets[lowest].word);
-		
-		//Appending each letters from correct_position if word is not alphabet
-		if (1<wcslen(comets[lowest].word))
-		{
-			for(i=comets[lowest].pos;i<wcslen(comets[lowest].word);i++)
-			{
-				buffer[iter]=L'.';iter++;
-				buffer[iter]=L' ';iter++;				
-				buffer[iter]=comets[lowest].word[i];iter++;
-			}
-		}
-		buffer[iter]=L'.';iter++;
-		buffer[iter]=L' ';iter++;		
-		buffer[iter] = L'\0';
-
-		pitch_and_rate = ((lowest_y*100)/(screen->h - images[IMG_CITY_BLUE]->h));
-		if (pitch_and_rate < 30)
-			pitch_and_rate = 30;
-		if (pitch_and_rate > 60)
-			pitch_and_rate = 60;	
-		T4K_Tts_say(pitch_and_rate,pitch_and_rate,INTERRUPT,"%S",buffer);
-		
-		//Wait to finish saying the previus word
-		SDL_WaitThread(tts_thread,NULL);
-		SDL_Delay(100);
-		fprintf(stderr,"\nPos = %d",braille_letter_pos);
-			
-	}
-	end:
-	return 1;
-}
-
-
-
-
-
+static void stop_tts_announcer();
+static int tts_announcer(void *unused);
 
 
 /* --- MAIN GAME FUNCTION!!! --- */
@@ -317,6 +243,7 @@ int PlayLaserGame(int diff_level)
                                    "key_unicode = %d\n", key_unicode);
 				}
 				
+				/* Store each keys till a key released */
 				if(settings.braille)
 				{
 				   pressed_letters[braille_iter] = event.key.keysym.sym;
@@ -331,6 +258,7 @@ int PlayLaserGame(int diff_level)
 			}
 			else if (event.type == SDL_KEYUP)
 			{
+				/* ----- SDL_KEYUP is Only for Braille Mode -------------*/
 				if(settings.braille)
 				{
 					wcscpy(pressed_letters,arrange_in_order(pressed_letters));
@@ -406,6 +334,10 @@ int PlayLaserGame(int diff_level)
 					}	
 			}
 			
+			
+			/* Set the Braille letter position 
+			* For some specific language's which have same braille code for
+			* alphabets and signs at begining, middle and end position. */			
 			if (lowest == -1)
 				braille_letter_pos = 0;
 			else
@@ -1332,3 +1264,77 @@ static void laser_add_score(int inc)
   if (score < 0) score = 0;
 }
 
+
+/* Stop annoncing thread safely */
+static void stop_tts_announcer()
+{
+	tts_announcer_exit = 1;
+}
+
+
+/* This function will announce the bottum most word and 
+ * it's remaining letters */
+static int tts_announcer(void *unused)
+{
+	int lowest,lowest_y,i,iter;
+	wchar_t buffer[3000];
+	int pitch_and_rate;
+	tts_announcer_exit = 0;
+	while(1)
+	{
+		if(tts_announcer_exit)
+			goto end;
+		
+		//Detecting the lowest letter and word on screen		
+		lowest_y = 0;
+		lowest = -1;	
+		for (i = 0; i < MAX_COMETS; i++)
+		{
+			if (comets[i].alive  &&
+			 comets[i].shootable  &&
+			  comets[i].expl == 0  &&
+			   comets[i].y > lowest_y)
+			{
+				lowest = i;
+				lowest_y = comets[i].y;
+			}
+		}
+		//Skipping if no letter found in screen
+		if (lowest == -1)
+			continue;
+		
+		buffer[0] = L'\0';
+		//Adding the word to buffer
+		wcscpy(buffer,comets[lowest].word);
+		iter = wcslen(comets[lowest].word);
+		
+		//Appending each letters from correct_position if word is not alphabet
+		if (1<wcslen(comets[lowest].word))
+		{
+			for(i=comets[lowest].pos;i<wcslen(comets[lowest].word);i++)
+			{
+				buffer[iter]=L'.';iter++;
+				buffer[iter]=L' ';iter++;				
+				buffer[iter]=comets[lowest].word[i];iter++;
+			}
+		}
+		buffer[iter]=L'.';iter++;
+		buffer[iter]=L' ';iter++;		
+		buffer[iter] = L'\0';
+
+		pitch_and_rate = ((lowest_y*100)/(screen->h - images[IMG_CITY_BLUE]->h));
+		if (pitch_and_rate < 30)
+			pitch_and_rate = 30;
+		if (pitch_and_rate > 60)
+			pitch_and_rate = 60;	
+		T4K_Tts_say(pitch_and_rate,pitch_and_rate,INTERRUPT,"%S",buffer);
+		
+		//Wait to finish saying the previus word
+		SDL_WaitThread(tts_thread,NULL);
+		SDL_Delay(100);
+		fprintf(stderr,"\nPos = %d",braille_letter_pos);
+			
+	}
+	end:
+	return 1;
+}
