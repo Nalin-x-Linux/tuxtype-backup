@@ -107,13 +107,15 @@ void LoadLang(void)
   DEBUGCODE { fprintf(stderr, "buf is: %s\n", buf); }
   
   
-  //Setting TTS language
+  /* Setting TTS language 
+   * with code such as ml for malayalam*/
   if (settings.tts)
   {
 	  sprintf(tts_language,"%.*s",2,buf);
 	  T4K_Tts_set_voice(tts_language);
   }
   
+  /* Loading braille Map */
   if (settings.braille)
   {
 	  char file_name[100];
@@ -123,7 +125,17 @@ void LoadLang(void)
 	  else{
 		  sprintf(file_name,"%s.txt",settings.theme_name);
 	  }
-	  braille_language_loader(file_name);
+	  
+	  //If map not found then disable braille mode
+	  if (braille_language_loader(file_name) == 0){
+		  if (settings.tts)
+		  {
+				T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT
+				,gettext("Braille mode is not available for this language. Braille disabled!"));
+		  }
+		  DEBUGCODE{  fprintf(stderr,"Braille disabled!"); }
+		  settings.braille = 0;
+	  }
   }
 
   if (my_setenv("LANG", buf) == -1)
