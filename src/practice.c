@@ -43,6 +43,7 @@ static SDL_Surface* keyboard = NULL;
 static SDL_Surface* keypress1 = NULL;
 static SDL_Surface* keypress2 = NULL;
 static SDL_Surface* hand[11] = {NULL};
+static SDL_Surface* braille_hand[65] = {NULL};
 static sprite* tux_stand = NULL;
 static sprite* tux_win = NULL;
 static SDL_Surface* time_label_srfc = NULL;
@@ -109,6 +110,87 @@ SDL_Surface* GetKeypress1(int index);
 SDL_Surface* GetKeypress2(int index);
 SDL_Surface* GetWrongKeypress(int index);
 static void print_load_results(void);
+
+
+void set_hand(int cursor,int cur_phrase)
+{
+	int fing,j,i;
+	
+	if (!settings.braille)
+    {
+			
+			int key = GetIndex(phrases[cur_phrase][cursor]);
+			int fing = GetFinger(key);
+			int shift = GetShift(key);
+			keypress1 = GetKeypress1(key);
+			keypress2 = GetKeypress2(key);
+ 
+			SDL_BlitSurface(CurrentBkgd(), &hand_loc, screen, &hand_loc);
+			SDL_BlitSurface(hands, NULL, screen, &hand_loc);
+
+			if (fing >= 0) 
+				SDL_BlitSurface(hand[fing], NULL, screen, &hand_loc);
+
+			SDL_BlitSurface(hand_shift[shift], NULL, screen, &hand_loc);
+
+			if (keypress1)
+			{
+				SDL_BlitSurface(keypress1, NULL, screen, &keyboard_loc);
+				SDL_FreeSurface(keypress1);
+				keypress1 = NULL;
+			}
+
+			if (keypress2)
+			{
+				SDL_BlitSurface(keypress2, NULL, screen, &keyboard_loc);
+				SDL_FreeSurface(keypress2);
+				keypress2 = NULL;
+			}
+	    }
+	    else
+		{
+			if (phrases[cur_phrase][cursor] == L' ')
+			{
+				fing = 64;
+				SDL_BlitSurface(CurrentBkgd(), &hand_loc, screen, &hand_loc);
+				SDL_BlitSurface(hands, NULL, screen, &hand_loc);
+				SDL_BlitSurface(braille_hand[fing], NULL, screen, &hand_loc);
+			}
+			else
+			{
+				for (i=0;i<100;i++)
+				{
+					if (braille_key_value_map[i].value_begin[0] == phrases[cur_phrase][cursor] 
+					||  braille_key_value_map[i].value_middle[0] == phrases[cur_phrase][cursor]
+					||  braille_key_value_map[i].value_end[0] == phrases[cur_phrase][cursor] 
+					||  (settings.use_english == 1 && braille_key_value_map[i].value_begin[0] == tolower(phrases[cur_phrase][cursor])))
+					{
+						fing = 0;
+						for(j=0;j<wcslen(braille_key_value_map[i].key);j++)
+						{
+							if (braille_key_value_map[i].key[j] == 'f')
+								fing += 1;
+							if (braille_key_value_map[i].key[j] == 'd')
+								fing += 2;							
+							if (braille_key_value_map[i].key[j] == 's')
+								fing += 4;
+							if (braille_key_value_map[i].key[j] == 'j')
+								fing += 8;																
+							if (braille_key_value_map[i].key[j] == 'k')
+								fing += 16;						
+							if (braille_key_value_map[i].key[j] == 'l')
+								fing += 32;
+						}
+						SDL_BlitSurface(CurrentBkgd(), &hand_loc, screen, &hand_loc);
+						SDL_BlitSurface(hands, NULL, screen, &hand_loc);
+						SDL_BlitSurface(braille_hand[fing], NULL, screen, &hand_loc);
+						
+					}
+				}
+			}
+				
+		}
+}
 
 /************************************************************************/
 /*                                                                      */ 
@@ -332,43 +414,11 @@ int Phrases(wchar_t* pphrase )
         break;
 
 
-      case 3: /* Wind up here the next time through the loop: */
-              /* If no typing for 0.5 sec, display hint:      */
-        if (SDL_GetTicks() - start > 500) 
-        {
-      
-          /* Show finger hint, if available. Note that GetFinger() */
-          /* returns negative values on error and never returns a  */
-          /* value greater than 9.                                 */
-          int key = GetIndex(phrases[cur_phrase][cursor]);
-          int fing = GetFinger(key);
-          int shift = GetShift(key);
-          keypress1 = GetKeypress1(key);
-          keypress2 = GetKeypress2(key);
-
-          SDL_BlitSurface(CurrentBkgd(), &hand_loc, screen, &hand_loc);
-          SDL_BlitSurface(hands, NULL, screen, &hand_loc);
-
-          if (fing >= 0) 
-            SDL_BlitSurface(hand[fing], NULL, screen, &hand_loc);
-          SDL_BlitSurface(hand_shift[shift], NULL, screen, &hand_loc);
-
-          if (keypress1)
-          {
-            SDL_BlitSurface(keypress1, NULL, screen, &keyboard_loc);
-            SDL_FreeSurface(keypress1);
-            keypress1 = NULL;
-          }
-
-          if (keypress2)
-          {
-            SDL_BlitSurface(keypress2, NULL, screen, &keyboard_loc);
-            SDL_FreeSurface(keypress2);
-            keypress2 = NULL;
-          }     
-
-          state = 4;
-        }
+      case 3: 
+        /* Wind up here the next time through the loop: */
+        /* If no typing for 0.5 sec, display hint:      */
+		set_hand(cursor,cur_phrase);
+		state = 4;     
         break;
 
       case 4:
@@ -388,36 +438,9 @@ int Phrases(wchar_t* pphrase )
 
       case 6:
       {
-        int key = GetIndex(phrases[cur_phrase][cursor]);
-        int fing = GetFinger(key);
-        int shift = GetShift(key);
-        keypress1 = GetKeypress1(key);
-        keypress2 = GetKeypress2(key);
- 
-        SDL_BlitSurface(CurrentBkgd(), &hand_loc, screen, &hand_loc);
-        SDL_BlitSurface(hands, NULL, screen, &hand_loc);
-
-        if (fing >= 0) 
-          SDL_BlitSurface(hand[fing], NULL, screen, &hand_loc);
-
-        SDL_BlitSurface(hand_shift[shift], NULL, screen, &hand_loc);
-
-        if (keypress1)
-        {
-          SDL_BlitSurface(keypress1, NULL, screen, &keyboard_loc);
-          SDL_FreeSurface(keypress1);
-          keypress1 = NULL;
-        }
-
-        if (keypress2)
-        {
-          SDL_BlitSurface(keypress2, NULL, screen, &keyboard_loc);
-          SDL_FreeSurface(keypress2);
-          keypress2 = NULL;
-        }
-
-        state = 13;
-        break;
+		  set_hand(cursor,cur_phrase);
+		  state = 13;
+		  break;
       }
 
       default:
@@ -1068,6 +1091,14 @@ static int practice_load_media(void)
     sprintf(fn, "hands/%d.png", i);
     hand[i] = LoadImage(fn, IMG_ALPHA);
     if (!hand[i])
+      load_failed = 1;
+  }
+
+  for (i = 1; i < 65; i++)
+  {
+    sprintf(fn, "braille_hands/%d.png", i);
+    braille_hand[i] = LoadImage(fn, IMG_ALPHA);
+    if (!braille_hand[i])
       load_failed = 1;
   }
 
