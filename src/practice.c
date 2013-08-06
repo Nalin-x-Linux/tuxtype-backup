@@ -110,87 +110,7 @@ SDL_Surface* GetKeypress1(int index);
 SDL_Surface* GetKeypress2(int index);
 SDL_Surface* GetWrongKeypress(int index);
 static void print_load_results(void);
-
-
-void set_hand(int cursor,int cur_phrase)
-{
-	int fing,j,i;
-	
-	if (!settings.braille)
-    {
-			
-			int key = GetIndex(phrases[cur_phrase][cursor]);
-			int fing = GetFinger(key);
-			int shift = GetShift(key);
-			keypress1 = GetKeypress1(key);
-			keypress2 = GetKeypress2(key);
- 
-			SDL_BlitSurface(CurrentBkgd(), &hand_loc, screen, &hand_loc);
-			SDL_BlitSurface(hands, NULL, screen, &hand_loc);
-
-			if (fing >= 0) 
-				SDL_BlitSurface(hand[fing], NULL, screen, &hand_loc);
-
-			SDL_BlitSurface(hand_shift[shift], NULL, screen, &hand_loc);
-
-			if (keypress1)
-			{
-				SDL_BlitSurface(keypress1, NULL, screen, &keyboard_loc);
-				SDL_FreeSurface(keypress1);
-				keypress1 = NULL;
-			}
-
-			if (keypress2)
-			{
-				SDL_BlitSurface(keypress2, NULL, screen, &keyboard_loc);
-				SDL_FreeSurface(keypress2);
-				keypress2 = NULL;
-			}
-	    }
-	    else
-		{
-			if (phrases[cur_phrase][cursor] == L' ')
-			{
-				fing = 64;
-				SDL_BlitSurface(CurrentBkgd(), &hand_loc, screen, &hand_loc);
-				SDL_BlitSurface(hands, NULL, screen, &hand_loc);
-				SDL_BlitSurface(braille_hand[fing], NULL, screen, &hand_loc);
-			}
-			else
-			{
-				for (i=0;i<100;i++)
-				{
-					if (braille_key_value_map[i].value_begin[0] == phrases[cur_phrase][cursor] 
-					||  braille_key_value_map[i].value_middle[0] == phrases[cur_phrase][cursor]
-					||  braille_key_value_map[i].value_end[0] == phrases[cur_phrase][cursor] 
-					||  (settings.use_english == 1 && braille_key_value_map[i].value_begin[0] == tolower(phrases[cur_phrase][cursor])))
-					{
-						fing = 0;
-						for(j=0;j<wcslen(braille_key_value_map[i].key);j++)
-						{
-							if (braille_key_value_map[i].key[j] == 'f')
-								fing += 1;
-							if (braille_key_value_map[i].key[j] == 'd')
-								fing += 2;							
-							if (braille_key_value_map[i].key[j] == 's')
-								fing += 4;
-							if (braille_key_value_map[i].key[j] == 'j')
-								fing += 8;																
-							if (braille_key_value_map[i].key[j] == 'k')
-								fing += 16;						
-							if (braille_key_value_map[i].key[j] == 'l')
-								fing += 32;
-						}
-						SDL_BlitSurface(CurrentBkgd(), &hand_loc, screen, &hand_loc);
-						SDL_BlitSurface(hands, NULL, screen, &hand_loc);
-						SDL_BlitSurface(braille_hand[fing], NULL, screen, &hand_loc);
-						
-					}
-				}
-			}
-				
-		}
-}
+static void set_hand(int cursor,int cur_phrase);
 
 /************************************************************************/
 /*                                                                      */ 
@@ -1690,4 +1610,95 @@ static int create_labels(void)
     return 1;
   else
     return 0;
+}
+
+
+/*****************************************************************
+ * Set the finger to the curresponding letter, if braille mode 
+ * is enabled fingers will be shown  
+ * **************************************************************/
+void set_hand(int cursor,int cur_phrase)
+{
+	int fing,j,i;	
+	if (!settings.braille)
+    {
+			
+			int key = GetIndex(phrases[cur_phrase][cursor]);
+			int fing = GetFinger(key);
+			int shift = GetShift(key);
+			keypress1 = GetKeypress1(key);
+			keypress2 = GetKeypress2(key);
+ 
+			SDL_BlitSurface(CurrentBkgd(), &hand_loc, screen, &hand_loc);
+			SDL_BlitSurface(hands, NULL, screen, &hand_loc);
+
+			if (fing >= 0) 
+				SDL_BlitSurface(hand[fing], NULL, screen, &hand_loc);
+
+			SDL_BlitSurface(hand_shift[shift], NULL, screen, &hand_loc);
+
+			if (keypress1)
+			{
+				SDL_BlitSurface(keypress1, NULL, screen, &keyboard_loc);
+				SDL_FreeSurface(keypress1);
+				keypress1 = NULL;
+			}
+
+			if (keypress2)
+			{
+				SDL_BlitSurface(keypress2, NULL, screen, &keyboard_loc);
+				SDL_FreeSurface(keypress2);
+				keypress2 = NULL;
+			}
+	    }
+	    else
+		{
+			/* If the next letter to be typed is space then the 64th image 
+			 * which contains right thumb will be shown */
+			if (phrases[cur_phrase][cursor] == L' ')
+			{
+				fing = 64;
+				SDL_BlitSurface(CurrentBkgd(), &hand_loc, screen, &hand_loc);
+				SDL_BlitSurface(hands, NULL, screen, &hand_loc);
+				SDL_BlitSurface(braille_hand[fing], NULL, screen, &hand_loc);
+			}
+			else
+			{
+				/* hear we check for the keycombination of the next letter to be typed */
+				for (i=0;i<100;i++)
+				{
+					/* We have to check each case because braille combination is same for
+					 * begining,middle and end of the word in which letters are not same */
+					if (braille_key_value_map[i].value_begin[0] == phrases[cur_phrase][cursor] 
+					||  braille_key_value_map[i].value_middle[0] == phrases[cur_phrase][cursor]
+					||  braille_key_value_map[i].value_end[0] == phrases[cur_phrase][cursor] 
+					||  (settings.use_english == 1 && braille_key_value_map[i].value_begin[0] 
+													== tolower(phrases[cur_phrase][cursor])))
+					{
+						/* This is working with a six bit binary system */
+						fing = 0;
+						for(j=0;j<wcslen(braille_key_value_map[i].key);j++)
+						{
+							if (braille_key_value_map[i].key[j] == 'f')
+								fing += 1;
+							if (braille_key_value_map[i].key[j] == 'd')
+								fing += 2;							
+							if (braille_key_value_map[i].key[j] == 's')
+								fing += 4;
+							if (braille_key_value_map[i].key[j] == 'j')
+								fing += 8;																
+							if (braille_key_value_map[i].key[j] == 'k')
+								fing += 16;						
+							if (braille_key_value_map[i].key[j] == 'l')
+								fing += 32;
+						}
+						SDL_BlitSurface(CurrentBkgd(), &hand_loc, screen, &hand_loc);
+						SDL_BlitSurface(hands, NULL, screen, &hand_loc);
+						SDL_BlitSurface(braille_hand[fing], NULL, screen, &hand_loc);
+						
+					}
+				}
+			}
+				
+		}
 }
