@@ -936,9 +936,64 @@ int Phrases(wchar_t* pphrase )
               if (settings.tts && settings.sys_sound && settings.menu_sound)
               {
 				  if (phrases[cur_phrase][cursor] == ' ')
+				  {
 					T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Type Space",phrases[cur_phrase][cursor]);
+				  }
 				  else
-					T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Type %C",phrases[cur_phrase][cursor]);
+				  {
+					  if (!settings.braille)
+					  {
+						  T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Type %C",phrases[cur_phrase][cursor]);
+					  }
+					  else
+					  {
+						  
+						  int j,len;
+						  wchar_t tts_temp[255];
+						  tts_temp[0] = L'\0';
+						  len = 0;
+						  
+						  /* hear we check for the keycombination of the next letter to be typed */
+						  for (i=0;i<100;i++)
+						  {
+							  /* We have to check each case because braille combination is same for
+							   * begining,middle and end of the word in which letters are not same */
+							   if (braille_key_value_map[i].value_begin[0] == phrases[cur_phrase][cursor] 
+								||  braille_key_value_map[i].value_middle[0] == phrases[cur_phrase][cursor]
+								||  braille_key_value_map[i].value_end[0] == phrases[cur_phrase][cursor] 
+								||  (settings.use_english == 1 && braille_key_value_map[i].value_begin[0] 
+													== tolower(phrases[cur_phrase][cursor])))
+								{
+									/* This is working with a six bit binary system */
+									
+									for(j=0;j<wcslen(braille_key_value_map[i].key);j++)
+									{
+										if (braille_key_value_map[i].key[j] == 'f')
+											tts_temp[len] = L'1';
+										if (braille_key_value_map[i].key[j] == 'd')
+											tts_temp[len] = L'2';						
+										if (braille_key_value_map[i].key[j] == 's')
+											tts_temp[len] = L'3';
+										if (braille_key_value_map[i].key[j] == 'j')
+											tts_temp[len] = L'4';																
+										if (braille_key_value_map[i].key[j] == 'k')
+											tts_temp[len] = L'5';					
+										if (braille_key_value_map[i].key[j] == 'l')
+											tts_temp[len] = L'6';
+										len++;
+										tts_temp[len] = L' ';
+										len++;
+										tts_temp[len] = L',';
+										len++;
+									}
+									tts_temp[len] = L'\0';
+									T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Type %C with dot %S",phrases[cur_phrase][cursor],tts_temp);
+									tts_temp[0] = L'\0';
+						
+								}
+							}
+					  }
+				  }
 			   }
             }
           }
