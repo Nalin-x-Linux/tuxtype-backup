@@ -9,7 +9,8 @@ SUBDIRS = backgrounds \
   keyboard \
   menu \
   status \
-  tux
+  tux	\
+  braille_hands
 
 imagesdir = $(pkgdatadir)/images
 
