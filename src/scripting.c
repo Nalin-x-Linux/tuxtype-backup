@@ -1120,6 +1120,12 @@ static int load_script(const char* fn)
 
 static void run_script(void)
 {
+	
+  /* Used to announce the Lesson instruction */
+  char *tts_buffer;
+  tts_buffer = malloc(sizeof(char)*1000000);
+  tts_buffer[0] = '\0';
+	
   /* FIXME FNLEN doesn't make sense for size of these arrays */
   Mix_Chunk* sounds[FNLEN] = {NULL};
 
@@ -1282,7 +1288,13 @@ static void run_script(void)
 
         case itemTEXT:
         {
-		  T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,APPEND,"%s",curItem->data);
+		  /* Append each text line's to the lesson instruction */
+          if (settings.tts)
+          {
+			  strcat(tts_buffer,curItem->data);
+		  }  
+			
+		  
 	
           SDL_Surface* img;
           SDL_Color* col;
@@ -1406,6 +1418,13 @@ static void run_script(void)
 
           // Make sure everything is on screen 
           SDL_Flip(screen);
+          
+          /* Announce the lesson instruction */
+          if (settings.tts)
+          {
+			  T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",tts_buffer);
+			  tts_buffer[0] = '\0';
+		  }  
 
           while (!done)
           {
@@ -1472,8 +1491,18 @@ static void run_script(void)
         {
 			
           int done = 0;
+          
+          /* Announce the lesson instruction */
+          if (settings.tts)
+          {
+			  T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%s",tts_buffer);
+			  tts_buffer[0] = '\0';
+		  }          
+          
+          
           // Make sure everything is on screen 
           SDL_Flip(screen);
+          
           
 
           while (!done)
