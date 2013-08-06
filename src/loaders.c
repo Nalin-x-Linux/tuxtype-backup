@@ -112,7 +112,12 @@ void LoadLang(void)
   if (settings.tts)
   {
 	  sprintf(tts_language,"%.*s",2,buf);
-	  T4K_Tts_set_voice(tts_language);
+	  if (!T4K_Tts_set_voice(tts_language))
+	  {
+		 T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT
+				,gettext("Tts is not available for this language. Tts disabled!"));
+		  settings.tts = 0;
+	  }
   }
   
   /* Loading braille Map */
