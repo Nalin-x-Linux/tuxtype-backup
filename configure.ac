@@ -409,6 +409,7 @@ data/images/backgrounds/Makefile
 data/images/cities/Makefile
 data/images/comets/Makefile
 data/images/hands/Makefile
+data/images/braille_hands/Makefile
 data/images/icons/Makefile
 data/images/keyboard/Makefile
 data/images/menu/Makefile
