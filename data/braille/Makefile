@@ -264,7 +264,7 @@ hindi.txt				\
 malayalam.txt				\
 numerical.txt				\
 punctuations.txt			\
-spanish.txt				\
+espanol.txt				\
 tamil.txt 				
 
 all: all-am
