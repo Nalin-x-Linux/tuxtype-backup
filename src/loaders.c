@@ -106,20 +106,7 @@ void LoadLang(void)
   buf[5] = '\0';  //en_US" rather than "en_US.utf8"
   DEBUGCODE { fprintf(stderr, "buf is: %s\n", buf); }
   
-  
-  /* Setting TTS language 
-   * with code such as ml for malayalam*/
-  if (settings.tts)
-  {
-	  sprintf(tts_language,"%.*s",2,buf);
-	  if (!T4K_Tts_set_voice(tts_language))
-	  {
-		 T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT
-				,gettext("Tts is not available for this language. Tts disabled!"));
-		  settings.tts = 0;
-	  }
-  }
-  
+    
   /* Loading braille Map */
   if (settings.braille)
   {
@@ -135,11 +122,24 @@ void LoadLang(void)
 	  if (braille_language_loader(file_name) == 0){
 		  if (settings.tts)
 		  {
-				T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT
+				T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,APPEND
 				,gettext("Braille mode is not available for this language. Braille disabled!"));
 		  }
 		  DEBUGCODE{  fprintf(stderr,"Braille disabled!"); }
 		  settings.braille = 0;
+	  }
+  }
+
+  /* Setting TTS language 
+   * with code such as ml for malayalam*/
+  if (settings.tts)
+  {
+	  sprintf(tts_language,"%.*s",2,buf);
+	  if (!T4K_Tts_set_voice(tts_language))
+	  {
+		 T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,APPEND,
+				gettext("Tts is not available for this language. Tts disabled!"));
+		  settings.tts = 0;
 	  }
   }
 
