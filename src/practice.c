@@ -57,6 +57,7 @@ static SDL_Surface* accuracy_label_srfc = NULL;
 static wchar_t phrases[MAX_PHRASES][MAX_PHRASE_LENGTH];
 static Mix_Chunk* wrong = NULL;
 static Mix_Chunk* cheer = NULL;
+static Mix_Chunk* snd_ok = NULL;
 
 
 static int phrase_draw_width = 0; /* How wide before text needs wrapping */
@@ -117,6 +118,89 @@ static void set_hand(int cursor,int cur_phrase);
 /*         "Public" functions (callable throughout program)             */
 /*                                                                      */
 /************************************************************************/
+
+wchar_t get_next_word_letters(int cur_phrase,int cursor,int till_next_space)
+{
+	int iter,i,len;
+	wchar_t temp[1000];
+	
+	
+	len = wcslen(phrases[cur_phrase]);
+	temp[0] = L'\0';
+	for(iter=0,i=cursor;i<=len;i++)
+	{
+		//Break if a space found
+		if(phrases[cur_phrase][i] == L' ')
+			break;
+		
+		if (phrases[cur_phrase][i] == L',')
+		{
+			wcscat(temp,L"Comma");
+			iter+=5;
+		}
+		else if (phrases[cur_phrase][i] == L'.')
+		{
+			wcscat(temp,L"Full stop");
+			iter+=9;
+		}
+		else if (phrases[cur_phrase][i] == L'\'')
+		{
+			wcscat(temp,L"Apostophe");
+			iter+=9;
+		}
+		else
+		{
+			temp[iter++] = L' ';
+			if(iswupper(phrases[cur_phrase][i]))
+			{
+				temp[iter] = L'\0';	
+				wcscat(temp,L"Capitol ");
+				iter+=8;
+			}
+			temp[iter++] = phrases[cur_phrase][i];
+			temp[iter++] = L' ';
+			temp[iter] = L'\0';	
+		}
+		
+		if (till_next_space == 0)
+			break;
+	}
+				
+
+	
+	//Add space if any
+	if (phrases[cur_phrase][i] == L' ')
+	{
+			wcscat(temp,L" Space");
+	}
+	
+	return temp;				
+
+}
+
+
+wchar_t get_next_word(int cur_phrase,int cursor)
+{
+	int iter,i,len;
+	wchar_t *temp;
+	
+	temp = (wchar_t *)malloc(1000); 
+	len = wcslen(phrases[cur_phrase]);
+	
+	for(iter=0,i=cursor;i<len;i++)
+	{
+		//Break if a space found
+		if(phrases[cur_phrase][i] == L' ')
+			break;
+		temp[iter] = phrases[cur_phrase][i];
+		iter++;								
+	}
+	temp[iter] = L'\0';
+	return temp;
+}
+
+
+
 
 /*  --------  This is the main function for the 'Practice' activity. ------ */
 int Phrases(wchar_t* pphrase )
@@ -181,11 +265,8 @@ int Phrases(wchar_t* pphrase )
   }
   /* Set up positions for blitting: */
   recalc_positions();
-
   
   start = tuxtime = SDL_GetTicks();
-
-
   /* Begin main event loop for "Practice" activity:  -------- */
   do
   {
@@ -211,28 +292,23 @@ int Phrases(wchar_t* pphrase )
         correct_chars = 0;
         wrong_chars = 0;
         
+        
+        wchar_t next_word[1000];
+        int iter,iter_word;
         /* Announce the entire line at the beginning */ 
         if (settings.tts && settings.sys_sound && settings.menu_sound)
         {
+			/* For Lesson's announce only current word */
 			if (pphrase == NULL){
 				/* For phrase typing */
-				T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",phrases[cur_phrase]);
+				T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S %S %S",
+					phrases[cur_phrase],get_next_word(cur_phrase,cursor),
+					get_next_word_letters(cur_phrase,cursor,1));
 			 }
-			else 
-			{
-				/* For Lesson's announce only current word */
-				len = wcslen(phrases[cur_phrase]);
-				for(iter=0,i=cursor;i<len;i++)
-				{
-					//Break when a space found
-					if(phrases[cur_phrase][i] == ' ')
-						break;
-					tts_temp[iter] = phrases[cur_phrase][i];iter++;	
-					tts_temp[iter] = '.';iter++;
-					tts_temp[iter] = ' ';iter++;							
-				}
-				tts_temp[iter] = '\0';
-				T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",tts_temp);
+			 else {
+				 //For lesson
+				 T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",
+					get_next_word_letters(cur_phrase,cursor,1));
 			}
 		}
 		
@@ -709,40 +785,32 @@ int Phrases(wchar_t* pphrase )
           correct_chars++;
           
           
-          /* --------- Announcing the next letter to Type --------------------------*/
-          tts_temp[0] = '\0';
-		  if (phrases[cur_phrase][cursor] == ' ')
+          /* --------- Announcing the next word to Type --------------------------*/
+          wchar_t next_word[1000];
+          next_word[0] = L'\0';
+          tts_temp[0] = L'\0';
+          int iter_word;
+		  if (phrases[cur_phrase][cursor-1] == L' ')
 		  {
-			  
-			  len = wcslen(phrases[cur_phrase]);
-			  
-			  if (pphrase == NULL)
-			  {
-				//For phrase typing 
-				for(iter=0,i=cursor+1;i<len;i++,iter++)
-					tts_temp[iter] = phrases[cur_phrase][i];
-			  }
-			  else {
+			  if (settings.tts){
+				if (pphrase == NULL){
+					//For phrase typing	  
+					T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,
+						"%S %S",get_next_word(cur_phrase,cursor),
+						get_next_word_letters(cur_phrase,cursor,1));	 
+				}
+				else {
 				  //For Lesson's
-				for(iter=0,i=cursor+1;i<len;i++)
-					{
-						//Break if a space found
-						if(phrases[cur_phrase][i] == ' ')
-							break;
-						tts_temp[iter] = phrases[cur_phrase][i];iter++;	
-						tts_temp[iter] = ' ';iter++;
-						tts_temp[iter] = '.';iter++;							
-					}
+				  T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",
+						get_next_word_letters(cur_phrase,cursor,1));	
+				}	  
 			  }
-			  tts_temp[iter] = '\0';
-			  if (settings.tts)
-					T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Space %S",tts_temp);			  			  
 		   }
-		   else
-		   {
+		   else{
 			  //Next letter is not Space
-			  if (settings.tts)
-				T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%C",phrases[cur_phrase][cursor]);			  
+			  //if (settings.tts)
+				//T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%C",phrases[cur_phrase][cursor]);			  
+		   PlaySound(snd_ok);
 		   }
 
 		   /* Setting the letter pos for braille acording to next letter to be typed 
@@ -935,18 +1003,13 @@ int Phrases(wchar_t* pphrase )
               /* Announce the letter again when incorrect letter. */
               if (settings.tts && settings.sys_sound && settings.menu_sound)
               {
-				  if (phrases[cur_phrase][cursor] == ' ')
-				  {
-					T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Type Space",phrases[cur_phrase][cursor]);
-				  }
-				  else
-				  {
-					  if (!settings.braille)
-					  {
-						  T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Type %C",phrases[cur_phrase][cursor]);
-					  }
-					  else
-					  {
+				 if (!settings.braille)
+				 {
+					  T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Type %S",
+				      get_next_word_letters(cur_phrase,cursor,1));
+				}
+				else
+				{
 						  
 						  int j,len;
 						  wchar_t tts_temp[255];
@@ -987,14 +1050,14 @@ int Phrases(wchar_t* pphrase )
 										len++;
 									}
 									tts_temp[len] = L'\0';
-									T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Type %C with dot %S",phrases[cur_phrase][cursor],tts_temp);
+									T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Type %S with dot %S",get_next_word_letters(cur_phrase,cursor,0),tts_temp);
 									tts_temp[0] = L'\0';
 						
 								}
 							}
 					  }
 				  }
-			   }
+			   
             }
           }
         }
@@ -1083,6 +1146,7 @@ static int practice_load_media(void)
   /* load needed sounds: */
   wrong = LoadSound("buzz.wav");
   cheer = LoadSound("cheer.wav");
+  snd_ok = LoadSound("tock.wav");
 
   /* load needed fonts: */
   calc_font_sizes();
