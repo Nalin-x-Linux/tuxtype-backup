@@ -135,21 +135,31 @@ wchar_t get_next_word_letters(int cur_phrase,int cursor,int till_next_space)
 		
 		if (phrases[cur_phrase][i] == L',')
 		{
-			wcscat(temp,L"Comma");
-			iter+=5;
+			wcscat(temp,gettext(L"comma"));
 		}
 		else if (phrases[cur_phrase][i] == L'.')
 		{
-			wcscat(temp,L"Full stop");
-			iter+=9;
+			wcscat(temp,gettext(L"full stop"));
 		}
 		else if (phrases[cur_phrase][i] == L'\'')
 		{
-			wcscat(temp,L"Apostophe");
-			iter+=9;
+			wcscat(temp,gettext(L"apostophe"));
+		}
+		else if (phrases[cur_phrase][i] == L';')
+		{
+			wcscat(temp,gettext(L"semicolon"));
+		}		
+		else if (phrases[cur_phrase][i] == L':')
+		{
+			wcscat(temp,gettext(L"colon"));
+		}
+		else if (phrases[cur_phrase][i] == L'?')
+		{
+			wcscat(temp,gettext(L"Qustion mark"));
 		}
 		else
 		{
+			iter = wcslen(temp);
 			temp[iter++] = L' ';
 			if(iswupper(phrases[cur_phrase][i]))
 			{
@@ -165,9 +175,6 @@ wchar_t get_next_word_letters(int cur_phrase,int cursor,int till_next_space)
 		if (till_next_space == 0)
 			break;
 	}
-				
-
-	
 	//Add space if any
 	if (phrases[cur_phrase][i] == L' ')
 	{
