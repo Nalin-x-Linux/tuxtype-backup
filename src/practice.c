@@ -112,6 +112,8 @@ SDL_Surface* GetKeypress2(int index);
 SDL_Surface* GetWrongKeypress(int index);
 static void print_load_results(void);
 static void set_hand(int cursor,int cur_phrase);
+wchar_t get_next_word_letters(int cur_phrase,int cursor,int till_next_space);
+wchar_t get_next_word(int cur_phrase,int cursor);
 
 /************************************************************************/
 /*                                                                      */ 
@@ -119,92 +121,6 @@ static void set_hand(int cursor,int cur_phrase);
 /*                                                                      */
 /************************************************************************/
 
-wchar_t get_next_word_letters(int cur_phrase,int cursor,int till_next_space)
-{
-	int iter,i,len;
-	wchar_t temp[1000];
-	
-	
-	len = wcslen(phrases[cur_phrase]);
-	temp[0] = L'\0';
-	for(iter=0,i=cursor;i<=len;i++)
-	{
-		//Break if a space found
-		if(phrases[cur_phrase][i] == L' ')
-			break;
-		
-		if (phrases[cur_phrase][i] == L',')
-		{
-			wcscat(temp,gettext(L"comma"));
-		}
-		else if (phrases[cur_phrase][i] == L'.')
-		{
-			wcscat(temp,gettext(L"full stop"));
-		}
-		else if (phrases[cur_phrase][i] == L'\'')
-		{
-			wcscat(temp,gettext(L"apostophe"));
-		}
-		else if (phrases[cur_phrase][i] == L';')
-		{
-			wcscat(temp,gettext(L"semicolon"));
-		}		
-		else if (phrases[cur_phrase][i] == L':')
-		{
-			wcscat(temp,gettext(L"colon"));
-		}
-		else if (phrases[cur_phrase][i] == L'?')
-		{
-			wcscat(temp,gettext(L"Qustion mark"));
-		}
-		else
-		{
-			iter = wcslen(temp);
-			temp[iter++] = L' ';
-			if(iswupper(phrases[cur_phrase][i]))
-			{
-				temp[iter] = L'\0';	
-				wcscat(temp,L"Capitol ");
-				iter+=8;
-			}
-			temp[iter++] = phrases[cur_phrase][i];
-			temp[iter++] = L' ';
-			temp[iter] = L'\0';	
-		}
-		
-		if (till_next_space == 0)
-			break;
-	}
-	//Add space if any
-	if (phrases[cur_phrase][i] == L' ')
-	{
-			wcscat(temp,L" Space");
-	}
-	
-	return temp;				
-
-}
-
-
-wchar_t get_next_word(int cur_phrase,int cursor)
-{
-	int iter,i,len;
-	wchar_t *temp;
-	
-	temp = (wchar_t *)malloc(1000); 
-	len = wcslen(phrases[cur_phrase]);
-	
-	for(iter=0,i=cursor;i<len;i++)
-	{
-		//Break if a space found
-		if(phrases[cur_phrase][i] == L' ')
-			break;
-		temp[iter] = phrases[cur_phrase][i];
-		iter++;								
-	}
-	temp[iter] = L'\0';
-	return temp;
-}
 
 
 
@@ -241,6 +157,7 @@ int Phrases(wchar_t* pphrase )
   wchar_t pressed_letters[1000];
   int braille_iter;
   int braille_capital = 0;
+  int braille_numbers = 0;
   int braille_letter_pos = 0;
 
 	//Moved by N.x.L
@@ -701,6 +618,13 @@ int Phrases(wchar_t* pphrase )
 				if (wcscmp(pressed_letters,L"g") == 0)
 					braille_capital = 1;
 				
+				/* ---- ; will load punctuation list ----------*/ 
+				if (wcscmp(pressed_letters,L";") == 0)
+				{
+					braille_language_loader("numerical.txt");
+					braille_numbers = 1;
+				}
+				
 				if (wcscmp(pressed_letters,L" ") != 0)
 				{
 					/* ------ Check pressed_letters which is not space --------*/
@@ -724,6 +648,18 @@ int Phrases(wchar_t* pphrase )
 										shift_pressed = 1;
 										braille_capital = 0;
 									}
+								if (braille_numbers)
+									{
+										braille_numbers = 0;
+										char file_name[100];
+										if(settings.use_english){
+											sprintf(file_name,"english.txt");
+											}
+										else{
+											sprintf(file_name,"%s.txt",settings.theme_name);
+											}
+										braille_language_loader(file_name);
+									}									
 							}
 						}	   
 					}
@@ -1827,4 +1763,102 @@ void set_hand(int cursor,int cur_phrase)
 			}
 				
 		}
+}
+
+/****************************************************************************
+ * get the remaining letter 
+ * if till_next_space  is 1 then get lettesrs till a space reached
+ * otherwise return only next charecter
+ * *************************************************************************/
+wchar_t get_next_word_letters(int cur_phrase,int cursor,int till_next_space)
+{
+	int iter,i,len;
+	wchar_t temp[1000];
+	
+	
+	len = wcslen(phrases[cur_phrase]);
+	temp[0] = L'\0';
+	for(iter=0,i=cursor;i<=len;i++)
+	{
+		//Break if a space found
+		if(phrases[cur_phrase][i] == L' ')
+			break;
+		
+		if (phrases[cur_phrase][i] == L',')
+		{
+			wcscat(temp,gettext(L"comma"));
+		}
+		else if (phrases[cur_phrase][i] == L'.')
+		{
+			wcscat(temp,gettext(L"full stop"));
+		}
+		else if (phrases[cur_phrase][i] == L'\'')
+		{
+			wcscat(temp,gettext(L"apostophe"));
+		}
+		else if (phrases[cur_phrase][i] == L';')
+		{
+			wcscat(temp,gettext(L"semicolon"));
+		}		
+		else if (phrases[cur_phrase][i] == L':')
+		{
+			wcscat(temp,gettext(L"colon"));
+		}
+		else if (phrases[cur_phrase][i] == L'?')
+		{
+			wcscat(temp,gettext(L"Qustion mark"));
+		}
+		else if (phrases[cur_phrase][i] == L'-')
+		{
+			wcscat(temp,gettext(L"Hyphen"));
+		}		
+		else
+		{
+			iter = wcslen(temp);
+			temp[iter++] = L' ';
+			if(iswupper(phrases[cur_phrase][i]))
+			{
+				temp[iter] = L'\0';	
+				wcscat(temp,L"Capitol ");
+				iter+=8;
+			}
+			temp[iter++] = phrases[cur_phrase][i];
+			temp[iter++] = L' ';
+			temp[iter] = L'\0';	
+		}
+		
+		if (till_next_space == 0)
+			break;
+	}
+	//Add space if any
+	if (phrases[cur_phrase][i] == L' ')
+	{
+			wcscat(temp,L" Space");
+	}
+	
+	return temp;				
+
+}
+
+/*********************************************************
+ * Get the next word 
+ ********************************************************/
+wchar_t get_next_word(int cur_phrase,int cursor)
+{
+	int iter,i,len;
+	wchar_t *temp;
+	
+	temp = (wchar_t *)malloc(1000); 
+	len = wcslen(phrases[cur_phrase]);
+	
+	for(iter=0,i=cursor;i<len;i++)
+	{
+		//Break if a space found
+		if(phrases[cur_phrase][i] == L' ')
+			break;
+		temp[iter] = phrases[cur_phrase][i];
+		iter++;								
+	}
+	temp[iter] = L'\0';
+	return temp;
 }
