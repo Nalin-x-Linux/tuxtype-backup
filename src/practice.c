@@ -320,7 +320,24 @@ int Phrases(wchar_t* pphrase )
           SDL_FreeSurface(tmpsurf);
           tmpsurf = NULL;
         }
-
+        
+        //Announce the word with re-draw
+        if (cursor != 0 && settings.tts)
+        {
+			if (pphrase == NULL){
+				//For phrase typing	  
+				T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,
+					"%S %S",get_next_word(cur_phrase,cursor),
+					get_next_word_letters(cur_phrase,cursor,1));	 
+				}
+				else {
+				  //For Lesson's
+				  T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",
+						get_next_word_letters(cur_phrase,cursor,1));	
+				}
+		}
+			
+			
       /* state == 2 means user has pressed key, either correct or incorrect */
       case 2:
         start = SDL_GetTicks();
