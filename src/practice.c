@@ -215,27 +215,7 @@ int Phrases(wchar_t* pphrase )
         prev_wrap = 0;
         correct_chars = 0;
         wrong_chars = 0;
-        
-        
-        wchar_t next_word[1000];
-        int iter,iter_word;
-        /* Announce the entire line at the beginning */ 
-        if (settings.tts && settings.sys_sound && settings.menu_sound)
-        {
-			/* For Lesson's announce only current word */
-			if (pphrase == NULL){
-				/* For phrase typing */
-				T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S %S %S",
-					phrases[cur_phrase],get_next_word(cur_phrase,cursor),
-					get_next_word_letters(cur_phrase,cursor,1));
-			 }
-			 else {
-				 //For lesson
-				 T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",
-					get_next_word_letters(cur_phrase,cursor,1));
-			}
-		}
-		
+        		
 		  //Inetialising braille variables
 		  braille_iter = 0;
 		  pressed_letters[braille_iter] = L'\0';			
@@ -322,7 +302,7 @@ int Phrases(wchar_t* pphrase )
         }
         
         //Announce the word with re-draw
-        if (cursor != 0 && settings.tts)
+        if (settings.tts)
         {
 			if (pphrase == NULL){
 				//For phrase typing	  
