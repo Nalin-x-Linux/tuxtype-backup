@@ -302,20 +302,18 @@ int Phrases(wchar_t* pphrase )
         }
         
         //Announce the word with re-draw
-        if (settings.tts)
-        {
-			if (pphrase == NULL){
-				//For phrase typing	  
-				T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,
-					"%S %S",get_next_word(cur_phrase,cursor),
-					get_next_word_letters(cur_phrase,cursor,1));	 
-				}
-				else {
-				  //For Lesson's
-				  T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",
-						get_next_word_letters(cur_phrase,cursor,1));	
-				}
+        if (pphrase == NULL){
+			//For phrase typing	  
+			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,
+				"%S %S",get_next_word(cur_phrase,cursor),
+				get_next_word_letters(cur_phrase,cursor,1));	 
+			}
+			else {
+			  //For Lesson's
+			  T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",
+					get_next_word_letters(cur_phrase,cursor,1));	
 		}
+		
 			
 			
       /* state == 2 means user has pressed key, either correct or incorrect */
@@ -732,24 +730,21 @@ int Phrases(wchar_t* pphrase )
           int iter_word;
 		  if (phrases[cur_phrase][cursor-1] == L' ')
 		  {
-			  if (settings.tts){
-				if (pphrase == NULL){
-					//For phrase typing	  
-					T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,
-						"%S %S",get_next_word(cur_phrase,cursor),
-						get_next_word_letters(cur_phrase,cursor,1));	 
+			  if (pphrase == NULL){
+				//For phrase typing	  
+				T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,
+					"%S %S",get_next_word(cur_phrase,cursor),
+					get_next_word_letters(cur_phrase,cursor,1));	 
 				}
 				else {
 				  //For Lesson's
 				  T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",
 						get_next_word_letters(cur_phrase,cursor,1));	
-				}	  
-			  }
+				}
 		   }
 		   else{
 			  //Next letter is not Space
-			  //if (settings.tts)
-				//T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%C",phrases[cur_phrase][cursor]);			  
+			  //T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%C",phrases[cur_phrase][cursor]);			  
 		   PlaySound(snd_ok);
 		   }
 
@@ -864,14 +859,11 @@ int Phrases(wchar_t* pphrase )
           if (cursor == wcslen(phrases[cur_phrase]))
           {
 			/* Annoncing the result */ 
-			if (settings.tts)
-			{
-				T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,
-			       gettext("Wow. you completed sentence with %s characters in \
-			       %s time, your speed is %s word per minut and \
-			       percentage of accuracy is %s"),chars_typed_str,time_str,
-			       wpm_str,accuracy_str);
-			}
+			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,
+			      gettext("Wow. you completed sentence with %s characters in \
+			      %s time, your speed is %s word per minut and \
+			      percentage of accuracy is %s"),chars_typed_str,time_str,
+			      wpm_str,accuracy_str);
             /* Draw Tux celebrating: */
             {
               int done = 0;
@@ -941,8 +933,6 @@ int Phrases(wchar_t* pphrase )
               PlaySound(wrong);
               
               /* Announce the letter again when incorrect letter. */
-              if (settings.tts && settings.sys_sound && settings.menu_sound)
-              {
 				 if (!settings.braille)
 				 {
 					  T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Type %S",
@@ -997,8 +987,6 @@ int Phrases(wchar_t* pphrase )
 							}
 					  }
 				  }
-			   
-            }
           }
         }
 	}

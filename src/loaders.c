@@ -120,11 +120,8 @@ void LoadLang(void)
 	  
 	  //If map not found then disable braille mode
 	  if (braille_language_loader(file_name) == 0){
-		  if (settings.tts)
-		  {
-				T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,APPEND
+		  T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,APPEND
 				,gettext("Braille mode is not available for this language. Braille disabled!"));
-		  }
 		  DEBUGCODE{  fprintf(stderr,"Braille disabled!"); }
 		  settings.braille = 0;
 	  }
@@ -132,16 +129,15 @@ void LoadLang(void)
 
   /* Setting TTS language 
    * with code such as ml for malayalam*/
-  if (settings.tts)
-  {
-	  sprintf(tts_language,"%.*s",2,buf);
-	  if (!T4K_Tts_set_voice(tts_language))
-	  {
-		 T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,APPEND,
-				gettext("Tts is not available for this language. Tts disabled!"));
-		  settings.tts = 0;
-	  }
-  }
+   sprintf(tts_language,"%.*s",2,buf);
+   if (!T4K_Tts_set_voice(tts_language))
+   {
+	 T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,APPEND,
+		gettext("Tts is not available for this language. Tts disabled!"));
+     settings.tts = 0;
+     text_to_speech_status = 0;
+   }
+  
 
   if (my_setenv("LANG", buf) == -1)
   {

@@ -121,6 +121,9 @@ typedef struct game_option_type{
   int hidden; // Read the README file in the image directory for info on this ;)
 } game_option_type;
 
+//Declared in t4k_global.h
+extern int text_to_speech_status;
+
 struct braille_dict
 {
 	wchar_t key[100];

@@ -132,11 +132,17 @@ int main(int argc, char *argv[])
 
       if (  (strcmp(argv[i], "-a") == 0)
          || (strcmp(argv[i], "--tts") == 0))
-        settings.tts = 1;
+         {
+			 settings.tts = 1;
+			 text_to_speech_status = 1;
+		 }
 
       if (  (strcmp(argv[i], "-na") == 0)
          || (strcmp(argv[i], "--notts") == 0))
-        settings.tts = 0;
+         {
+			 settings.tts = 0;
+			 text_to_speech_status = 0;
+		 }
 
       if (  (strcmp(argv[i], "-b") == 0)
          || (strcmp(argv[i], "--braille") == 0))
@@ -197,11 +203,8 @@ int main(int argc, char *argv[])
   
   
   /* Initialising TTS */
-  if (settings.tts)
-  {
-	  T4K_Tts_init();
-	  T4K_Tts_set_volume(settings.tts_volume);
-  }
+   T4K_Tts_init();
+   T4K_Tts_set_volume(settings.tts_volume);
   
   /* FIXME: we should check config files/environment variables like LANG! */
   /* NOTE what should we do if LANG is something without a theme - should */

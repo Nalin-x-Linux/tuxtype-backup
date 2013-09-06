@@ -172,11 +172,9 @@ int PlayLaserGame(int diff_level)
 	
 
 
-	if (settings.tts && settings.sys_sound) 
-	{
-	  //Call announcer function in thread which annonces the word to type 
-	  thread = SDL_CreateThread(tts_announcer, NULL);
-	}	
+	 //Call announcer function in thread which annonces the word to type 
+	if(settings.tts)
+		thread = SDL_CreateThread(tts_announcer, NULL);	
 	
 	//Inetialising braille variables
 	braille_iter = 0;
@@ -537,9 +535,7 @@ int PlayLaserGame(int diff_level)
 				}
 			} else {
 				if (num_comets_alive == 0) {
-					if (settings.tts){
-						T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,gettext("Score %d"),score);
-					}
+					T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,gettext("Score %d"),score);
 					/* Time for the next wave! */
 
 					/* FIXME: End of level stuff goes here */
@@ -592,10 +588,10 @@ int PlayLaserGame(int diff_level)
                 if ((num_cities_alive==0) && (gameover == 0))
                 {
                     gameover = GAMEOVER_COUNTER_START;
-                    if(settings.tts){
+                    if(settings.tts)
 						stop_tts_announcer();
-						T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,gettext("yep you miss it. hahh hahh haa. game over! you scored %d goodbye!"),score);
-					}
+					T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,gettext("yep you miss it. hahh hahh haa. game over! you scored %d goodbye!"),score);
+					
 				}
       
 		/* Draw background: */
@@ -736,15 +732,15 @@ int PlayLaserGame(int diff_level)
 		/* If we're in "PAUSE" mode, pause! */
 
 		if (paused) {
-			if(settings.tts){
+			if(settings.tts)
 				stop_tts_announcer();
-				T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,gettext("Game Paused!"));
-			}
+			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,gettext("Game Paused!"));
 			quit = Pause();
-			if(settings.tts && settings.sys_sound && quit == 0){
+			if(quit == 0){
 					T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,gettext("Pause Released!"));
 					//Call announcer function in thread which annonces the word to type
-					thread = SDL_CreateThread(tts_announcer, NULL);
+					if(settings.tts)
+						thread = SDL_CreateThread(tts_announcer, NULL);
 			}							
 			paused = 0;
 		}
