@@ -112,8 +112,8 @@ SDL_Surface* GetKeypress2(int index);
 SDL_Surface* GetWrongKeypress(int index);
 static void print_load_results(void);
 static void set_hand(int cursor,int cur_phrase);
-wchar_t get_next_word_letters(int cur_phrase,int cursor,int till_next_space);
-wchar_t get_next_word(int cur_phrase,int cursor);
+wchar_t *get_next_word_letters(int cur_phrase,int cursor,int till_next_space);
+wchar_t *get_next_word(int cur_phrase,int cursor);
 
 /************************************************************************/
 /*                                                                      */ 
@@ -1755,7 +1755,7 @@ void set_hand(int cursor,int cur_phrase)
  * if till_next_space  is 1 then get lettesrs till a space reached
  * otherwise return only next charecter
  * *************************************************************************/
-wchar_t get_next_word_letters(int cur_phrase,int cursor,int till_next_space)
+wchar_t *get_next_word_letters(int cur_phrase,int cursor,int till_next_space)
 {
 	int iter,i,len;
 	wchar_t temp[1000];
@@ -1828,14 +1828,14 @@ wchar_t get_next_word_letters(int cur_phrase,int cursor,int till_next_space)
 /*********************************************************
  * Get the next word 
  ********************************************************/
-wchar_t get_next_word(int cur_phrase,int cursor)
+wchar_t *get_next_word(int cur_phrase,int cursor)
 {
 	int iter,i,len;
 	wchar_t *temp;
-	
 	temp = (wchar_t *)malloc(1000); 
-	len = wcslen(phrases[cur_phrase]);
+	temp[0] = L'\0';
 	
+	len = wcslen(phrases[cur_phrase]);
 	for(iter=0,i=cursor;i<len;i++)
 	{
 		//Break if a space found
