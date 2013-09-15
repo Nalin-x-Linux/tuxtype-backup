@@ -30,6 +30,8 @@ fdsjl ഷ ഷ ഷ
 dsj സ സ സ
 fdk ഹ ഹ ഹ
 jkl ള ള ള
+fd ബ ബ ബ
+jk ഭ ഭ ഭ
 fdskl ഴ ഴ ഴ
 fdjkl റ റ റ
 f അ അ അ
@@ -56,3 +58,4 @@ dk : : :
 s ' ' '
 sl - - -
 dsl ? ? ?
+fskl ‍ ‍ ‍
