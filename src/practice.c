@@ -303,12 +303,21 @@ int Phrases(wchar_t* pphrase )
         
         //Announce the word with re-draw
         if (pphrase == NULL){
-			//For phrase typing	  
-			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,
-				"%S %S",get_next_word(cur_phrase,cursor),
-				get_next_word_letters(cur_phrase,cursor,1));	 
+			//For phrase typing
+			fprintf(stderr,">SLKDLKD >>>> %d",cursor);
+			if (cursor == 0){
+				T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,
+				"%S %S %S",phrases[cur_phrase],get_next_word(cur_phrase,cursor),
+				get_next_word_letters(cur_phrase,cursor,1));
 			}
-			else {
+			else
+			{
+				T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,
+				"%S %S",get_next_word(cur_phrase,cursor),
+				get_next_word_letters(cur_phrase,cursor,1));
+			}	 
+		}
+		else {
 			  //For Lesson's
 			  T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%S",
 					get_next_word_letters(cur_phrase,cursor,1));	
