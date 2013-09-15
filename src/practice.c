@@ -115,6 +115,9 @@ static void set_hand(int cursor,int cur_phrase);
 wchar_t *get_next_word_letters(int cur_phrase,int cursor,int till_next_space);
 wchar_t *get_next_word(int cur_phrase,int cursor);
 
+//Braille Variable
+int braille_letter_pos;
+
 /************************************************************************/
 /*                                                                      */ 
 /*         "Public" functions (callable throughout program)             */
@@ -158,7 +161,7 @@ int Phrases(wchar_t* pphrase )
   int braille_iter;
   int braille_capital = 0;
   int braille_numbers = 0;
-  int braille_letter_pos = 0;
+  braille_letter_pos = 0;
 
 	//Moved by N.x.L
 	int key;
@@ -304,7 +307,6 @@ int Phrases(wchar_t* pphrase )
         //Announce the word with re-draw
         if (pphrase == NULL){
 			//For phrase typing
-			fprintf(stderr,">SLKDLKD >>>> %d",cursor);
 			if (cursor == 0){
 				T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,
 				"%S %S %S",phrases[cur_phrase],get_next_word(cur_phrase,cursor),
@@ -755,21 +757,7 @@ int Phrases(wchar_t* pphrase )
 			  //Next letter is not Space
 			  //T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%C",phrases[cur_phrase][cursor]);			  
 		   PlaySound(snd_ok);
-		   }
-
-		   /* Setting the letter pos for braille acording to next letter to be typed 
-		    * For some specific language's which have same braille code for
-		    * alphabets and signs at begining, middle and end position.*/
-		   if (phrases[cur_phrase][cursor-1] == ' '){
-				braille_letter_pos = 0;
-		   }
-		   else{
-			   if (phrases[cur_phrase][cursor+1] == ' ')
-					braille_letter_pos = 2;
-			   else
-					braille_letter_pos = 1;
-			}
-		  
+		   } 
 		  
 
           /* Handle wrapping if we are at the end of the current display. */
@@ -1752,6 +1740,15 @@ void set_hand(int cursor,int cur_phrase)
 						SDL_BlitSurface(hands, NULL, screen, &hand_loc);
 						SDL_BlitSurface(braille_hand[fing], NULL, screen, &hand_loc);
 						
+						/* Setting the letter pos for braille acording to next letter to be typed 
+						 * For some specific language's which have same braille code for
+						 * alphabets and signs at begining, middle and end position.*/
+						if (braille_key_value_map[i].value_end[0] == phrases[cur_phrase][cursor] )
+							braille_letter_pos = 2;
+						else if (braille_key_value_map[i].value_middle[0] == phrases[cur_phrase][cursor] )
+							braille_letter_pos = 1;
+						else
+							braille_letter_pos = 0;					
 					}
 				}
 			}
