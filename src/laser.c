@@ -50,7 +50,7 @@ static SDL_Surface* images[NUM_IMAGES] = {NULL};
 static Mix_Chunk* sounds[NUM_SOUNDS] = {NULL};
 static Mix_Music* musics[NUM_MUSICS] = {NULL};
 
-static int wave, speed, score, pre_wave_score, num_attackers, distanceMoved;
+static int wave, speed, score, pre_wave_score, num_attackers, distanceMoved , num_cities_alive;
 static wchar_t ans[NUM_ANS];
 static int ans_num;
 
@@ -58,7 +58,7 @@ static comet_type comets[MAX_COMETS];
 static city_type cities[NUM_CITIES];
 static laser_type laser;
 
-static int tts_announcer_exit = 0;
+static int tts_announcer_switch = 1;
 static int braille_letter_pos = 0;
 
 /* Local function prototypes: */
@@ -78,6 +78,7 @@ static void stop_tts_announcer();
 static int tts_announcer(void *unused);
 
 
+
 /* --- MAIN GAME FUNCTION!!! --- */
 
 /* TODO modify game to allow longer words (12 chars or so) */
@@ -86,7 +87,7 @@ int PlayLaserGame(int diff_level)
 {
 	int i, img, done, quit, frame, lowest, lowest_y, 
 	    tux_img, old_tux_img, tux_pressing, tux_anim, tux_anim_frame,
-	    tux_same_counter, level_start_wait, num_cities_alive,
+	    tux_same_counter, level_start_wait,
 	    num_comets_alive, paused, picked_comet, 
 	    gameover;
 	  
@@ -212,6 +213,17 @@ int PlayLaserGame(int diff_level)
 
 				if (key == SDLK_ESCAPE)
 					paused = 1;
+				/* Score */
+				if(key == SDLK_F1)
+					tts_announcer_switch = 2;
+				
+				/* iglu alive */
+				if(key == SDLK_F2)
+					tts_announcer_switch = 3;
+				
+				/* Wave number */
+				if(key == SDLK_F3)
+					tts_announcer_switch = 4;
 
 				/* --- eat other keys until level wait has passed --- */ 
 				if (level_start_wait > 0) 
@@ -1264,7 +1276,7 @@ static void laser_add_score(int inc)
 /* Stop annoncing thread safely */
 static void stop_tts_announcer()
 {
-	tts_announcer_exit = 1;
+	tts_announcer_switch = 0;
 }
 
 
@@ -1275,11 +1287,34 @@ static int tts_announcer(void *unused)
 	int lowest,lowest_y,i,iter;
 	wchar_t buffer[3000];
 	int pitch_and_rate;
-	tts_announcer_exit = 0;
+	tts_announcer_switch = 1;
 	while(1)
 	{
-		if(tts_announcer_exit)
+		if(tts_announcer_switch == 0)
 			goto end;
+		else if(tts_announcer_switch == 2)
+		{
+			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"Score %d!",score);
+			SDL_Delay(20);
+			T4K_Tts_wait();
+			tts_announcer_switch = 1;
+		}
+		else if(tts_announcer_switch == 3)
+		{
+			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%d cities alive!",num_cities_alive);
+			SDL_Delay(20);
+			T4K_Tts_wait();
+			tts_announcer_switch = 1;
+		}		
+		else if(tts_announcer_switch == 4)
+		{
+			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"on wave %d!",wave);
+			SDL_Delay(20);
+			T4K_Tts_wait();
+			tts_announcer_switch = 1;
+		}
+
+			
 		
 		//Detecting the lowest letter and word on screen		
 		lowest_y = 0;
