@@ -39,7 +39,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* Should these be constants? */
 static int tux_max_width = 0;                // the max width of the images of tux
 static int number_max_w = 0;                 // the max width of a number image
-static int tts_announcer_exit = 0;
+static int tts_announcer_switch = 1;
 int braille_letter_pos=0;
 
 //static SDL_Surface* background = NULL;
@@ -94,6 +94,7 @@ static void SpawnFishies(int diflevel, int* fishies, int* frame);
 static void UpdateTux(wchar_t letter_pressed, int fishies, int frame);
 static void WaitFrame(void);
 
+int playing_level,fish_left,curlives;
 
 
 /************************************************************************/
@@ -109,17 +110,16 @@ int PlayCascade(int diflevel)
 {
   char filename[FNLEN];
   int still_playing = 1;
-  int tts_announcer_exit=0;
-  int playing_level = 1;
+  playing_level = 1;
   int setup_new_level = 1;
   int won_level = 0;
   int quitting = 0;
   int curlevel = 0;
   int i = 0;
-  int curlives = 0;
+  curlives = 0;
   int oldlives = 0;
   int oldfish_left = 0;
-  int fish_left = 0;
+  fish_left = 0;
   int fishies = 0;
   int local_max_fishies = 1;
   int frame = 0;
@@ -341,6 +341,17 @@ int PlayCascade(int diflevel)
               case SDLK_F12:
                 // SNOW_toggle();
                 break;
+
+
+			   /* Fish left */
+			   case SDLK_F1:
+				tts_announcer_switch = 2;
+				break;
+			
+			   /* lives remaining */
+			   case SDLK_F2:
+				tts_announcer_switch = 3;
+				break;				
 
               case SDLK_ESCAPE:
 				if(settings.tts)
@@ -1780,7 +1791,7 @@ static int tts_announcer(void *struct_address)
 	int alive,temp;
 	int pitch_and_rate;
 	int which,correct_position;
-	tts_announcer_exit = 0;
+	tts_announcer_switch = 1;
 	int max;
 	
 	while(1)
@@ -1788,8 +1799,22 @@ static int tts_announcer(void *struct_address)
 		//Converting and taking the value of fishies from void address structure 
 		fishies = *struct_with_data_address.address_of_fishies;
 		
-		if(tts_announcer_exit)
-			goto end;
+		if(tts_announcer_switch == 0)
+			goto end; 
+		else if(tts_announcer_switch == 2)
+		{
+			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"fish_left %d!",fish_left);
+			SDL_Delay(20);
+			T4K_Tts_wait();
+			tts_announcer_switch = 1;
+		}
+		else if(tts_announcer_switch == 3)
+		{
+			T4K_Tts_say(DEFAULT_VALUE,DEFAULT_VALUE,INTERRUPT,"%d lives remaining!",curlives);
+			SDL_Delay(20);
+			T4K_Tts_wait();
+			tts_announcer_switch = 1;
+		}			
 		
 		
 		//Wait to finish saying the previus word	
@@ -1837,7 +1862,7 @@ static int tts_announcer(void *struct_address)
 			//Using this corrected order to say each words and letters
 			for(i=0;i<=max;i++)
 			{
-				if(tts_announcer_exit)
+				if(tts_announcer_switch == 0)
 					goto end;
 												
 				//Adding the word
@@ -1961,7 +1986,7 @@ static int tts_announcer(void *struct_address)
 /********** Stop annoncing thread safely *********/
 static void stop_tts_announcer()
 {
-	tts_announcer_exit = 1;	
+	tts_announcer_switch = 0;	
 }
 
 
